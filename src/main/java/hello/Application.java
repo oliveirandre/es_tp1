@@ -5,20 +5,19 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.Iterator;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import net.sf.json.*;
+import org.json.*;
 
 @SpringBootApplication
 @RestController
 public class Application {
 
 	@RequestMapping("/")
-	public String home() throws IOException {
-                JSONObject json = new JSONObject();
-                
+	public String home() throws IOException, JSONException {
 		return GETQuoteRequest();
 	}
 
@@ -26,8 +25,8 @@ public class Application {
 		SpringApplication.run(Application.class, args);
 	}
         
-        public static String GETQuoteRequest() throws IOException {
-            URL url = new URL("http://quotes.rest/qod.json");
+        public static String GETQuoteRequest() throws IOException, JSONException {
+            URL url = new URL("http://quotes.rest/quote/random.json");
             String readLine = null;
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
             connection.setRequestMethod("GET");
@@ -41,9 +40,11 @@ public class Application {
                     response.append(readLine);
                 }
                 in.close();
-                JSONObject json = new JSONObject();
-                
-                return response.toString();
+                JSONObject json = new JSONObject(response.toString());
+                JSONObject contents = new JSONObject(json.get("contents").toString());
+                JSONObject quotes = new JSONObject(contents.get("quotes").toString());                
+                //String quote = json.getString("contents");
+                return quotes.toString();
             }
             else {
                 return "Error.";
