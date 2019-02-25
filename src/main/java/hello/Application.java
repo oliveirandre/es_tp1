@@ -49,7 +49,8 @@ public class Application {
                 String str = quotes.toString();
                 str = str.substring(1, str.length()-1);
                 JSONObject object = new JSONObject(str);
-                return object.get("quote").toString();
+                System.out.println(response.toString());
+                return object.get("quote").toString() + " by " + object.get("author").toString();
             }
             else {
                 return "Error.";
