@@ -18,18 +18,22 @@ public class Application {
 
 	@RequestMapping("/quote")
 	public String home() throws IOException, JSONException {
-		return GETQuoteRequest();
+            String quote = GETQuoteRequest();
+            JSONObject time = GETTimeRequest();
+            //return time.toString();
+            String str = time.get("currentDateTime").toString();
+            return quote + "\n  " + str;
 	}
-	@RequestMapping("/time")
+	@RequestMapping("/metereology")
 	public String time() throws IOException, JSONException {
-		return GETTimeRequest();
+		return GETMeteRequest();
 	}
 	public static void main(String[] args) {
 		SpringApplication.run(Application.class, args);
 	}
         
         public static String GETQuoteRequest() throws IOException, JSONException {
-            URL url = new URL("http://quotes.rest/qod.json");
+            URL url = new URL("http://quotes.rest/qod.json?category=management");
             String readLine = null;
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
             connection.setRequestMethod("GET");
@@ -59,7 +63,29 @@ public class Application {
                 return "Error.";
             }
         }
-        public static String GETTimeRequest() throws IOException, JSONException {
+        public static JSONObject GETTimeRequest() throws IOException, JSONException {
+            URL url = new URL("http://worldclockapi.com/api/json/utc/now");
+            String readLine = null;
+            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+            connection.setRequestMethod("GET");
+            int responseCode = connection.getResponseCode();
+
+            if (responseCode == HttpURLConnection.HTTP_OK) {
+                BufferedReader in = new BufferedReader(
+                   new InputStreamReader(connection.getInputStream()));
+                StringBuffer response = new StringBuffer();
+                while((readLine = in.readLine()) != null) {
+                    response.append(readLine);
+                }
+                in.close();
+                System.out.print(response.toString());
+                return new JSONObject(response.toString());
+            }
+            else {
+                return null;
+            }
+        }
+        public static String GETMeteRequest() throws IOException, JSONException {
             URL url = new URL("http://api.ipma.pt/open-data/distrits-islands.json");
             String readLine = null;
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
