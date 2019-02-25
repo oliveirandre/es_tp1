@@ -43,10 +43,13 @@ public class Application {
                 JSONObject json = new JSONObject(response.toString());
                 JSONObject contents = new JSONObject(json.get("contents").toString());
                 JSONArray quotes = new JSONArray(contents.get("quotes").toString());
-                JSONObject quote = quotes.getJSONObject(1);
+                //JSONObject quote = quotes.getJSONObject(1);
                 //JSONObject quotes = new JSONObject(contents.get("quotes").toString());                
                 //String quote = json.getString("contents");
-                return quote.getJSONObject("quote").toString();
+                String str = quotes.toString();
+                str = str.substring(1, str.length()-1);
+                JSONObject object = new JSONObject(str);
+                return object.get("quote").toString();
             }
             else {
                 return "Error.";
