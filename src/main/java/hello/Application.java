@@ -24,9 +24,9 @@ public class Application {
             String str = time.get("currentDateTime").toString();
             return quote + "\n  " + str;
 	}
-	@RequestMapping("/metereology")
+	@RequestMapping("/weather")
 	public String time() throws IOException, JSONException {
-		return GETMeteRequest();
+		return getWeatherRequest();
 	}
 	public static void main(String[] args) {
 		SpringApplication.run(Application.class, args);
@@ -85,7 +85,8 @@ public class Application {
                 return null;
             }
         }
-        public static String GETMeteRequest() throws IOException, JSONException {
+        public static String getWeatherRequest() throws IOException, JSONException {
+            // GET the global ID Local from a Portuguese City
             URL url = new URL("http://api.ipma.pt/open-data/distrits-islands.json");
             String readLine = null;
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
@@ -99,40 +100,31 @@ public class Application {
                     response.append(readLine);
                 }
                 in.close();
-                System.out.println("ResponseCode :"+responseCode);
                 JSONObject json = new JSONObject(response.toString());
-                System.out.print(json);
                 JSONArray data = new JSONArray(json.get("data").toString());
-                System.out.print(data);
                 String str = data.toString();
                 str = str.substring(1, str.length()-1);
-                System.out.print(str);
                 JSONObject object = new JSONObject(str);
                 
-                URL url1 = new URL("http://api.ipma.pt/open-data/forecast/meteorology/cities/daily/"+object.get("globalIdLocal").toString()+".json"); //Aveiro
-                String readLine1 = null;
-                HttpURLConnection connection1 = (HttpURLConnection) url1.openConnection();
-                connection1.setRequestMethod("GET");
-                int responseCode1 = connection1.getResponseCode();
+                // Use the global ID Local to get the parameters about the weather in that City
+                URL time = new URL("http://api.ipma.pt/open-data/forecast/meteorology/cities/daily/"+object.get("globalIdLocal").toString()+".json"); //Aveiro
+                String line = null;
+                HttpURLConnection conn = (HttpURLConnection) time.openConnection();
+                conn.setRequestMethod("GET");
+                int code = conn.getResponseCode();
 
-                if (responseCode1 == HttpURLConnection.HTTP_OK) {
-                    BufferedReader in1 = new BufferedReader(
-                       new InputStreamReader(connection1.getInputStream()));
-                    StringBuffer response1 = new StringBuffer();
-                    while((readLine1 = in1.readLine()) != null) {
-                        response1.append(readLine1);
+                if (code == HttpURLConnection.HTTP_OK) {
+                    BufferedReader read = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+                    StringBuffer resp = new StringBuffer();
+                    while((line = read.readLine()) != null) {
+                        resp.append(line);
                     }
-                    in1.close();
-                    System.out.println("ResponseCode :"+responseCode);
-                    JSONObject json1 = new JSONObject(response1.toString());
-                    System.out.print(json1);
-                    JSONArray data1 = new JSONArray(json1.get("data").toString());
-                    System.out.print(data1);
-                    String str1 = data1.toString();
-                    str1 = str1.substring(1, str1.length()-1);
-                    System.out.print(str1);
-                    JSONObject object1 = new JSONObject(str1);
-                    return object.get("local").toString() + "   Temperatura Máxima : " +object1.get("tMax").toString()+"ºC\n    Temperatura Minima : "+object1.get("tMin").toString()+"ºC\n";
+                    read.close();
+                    JSONObject ipma = new JSONObject(resp.toString());
+                    JSONArray d = new JSONArray(ipma.get("data").toString());
+                    String st = d.toString().substring(1, d.toString().length()-1);
+                    JSONObject ob = new JSONObject(st);
+                    return object.get("local").toString() + "   Temperatura Máxima : " +ob.get("tMax").toString()+"ºC\n    Temperatura Minima : "+ob.get("tMin").toString()+"ºC\n";
                 }
                 else{return "Error.";}
             } else { return "Error."; }
