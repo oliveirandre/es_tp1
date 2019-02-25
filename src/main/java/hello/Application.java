@@ -26,7 +26,7 @@ public class Application {
 	}
         
         public static String GETQuoteRequest() throws IOException, JSONException {
-            URL url = new URL("http://quotes.rest/quote/random.json");
+            URL url = new URL("http://quotes.rest/qod.json");
             String readLine = null;
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
             connection.setRequestMethod("GET");
@@ -42,9 +42,11 @@ public class Application {
                 in.close();
                 JSONObject json = new JSONObject(response.toString());
                 JSONObject contents = new JSONObject(json.get("contents").toString());
-                JSONObject quotes = new JSONObject(contents.get("quotes").toString());                
+                JSONArray quotes = new JSONArray(contents.get("quotes").toString());
+                JSONObject quote = quotes.getJSONObject(1);
+                //JSONObject quotes = new JSONObject(contents.get("quotes").toString());                
                 //String quote = json.getString("contents");
-                return quotes.toString();
+                return quote.getJSONObject("quote").toString();
             }
             else {
                 return "Error.";
