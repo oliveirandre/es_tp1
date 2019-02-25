@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.Iterator;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -17,11 +18,7 @@ public class Application {
 
 	@RequestMapping("/quote")
 	public String home() throws IOException, JSONException {
-		String quote = GETQuoteRequest();
-                JSONObject time = GETTimeRequest();
-                //return time.toString();
-                String str = time.get("currentDateTime").toString();
-                return quote + "\n" + str;
+		return GETQuoteRequest();
 	}
 	@RequestMapping("/time")
 	public String time() throws IOException, JSONException {
@@ -32,7 +29,7 @@ public class Application {
 	}
         
         public static String GETQuoteRequest() throws IOException, JSONException {
-            URL url = new URL("http://quotes.rest/qod.json?category=management");
+            URL url = new URL("http://quotes.rest/qod.json");
             String readLine = null;
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
             connection.setRequestMethod("GET");
@@ -116,27 +113,5 @@ public class Application {
             
         }
         
-        public static JSONObject GETTimeRequest() throws IOException, JSONException {
-            URL url = new URL("http://worldclockapi.com/api/json/utc/now");
-            String readLine = null;
-            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-            connection.setRequestMethod("GET");
-            int responseCode = connection.getResponseCode();
-            
-            if (responseCode == HttpURLConnection.HTTP_OK) {
-                BufferedReader in = new BufferedReader(
-                   new InputStreamReader(connection.getInputStream()));
-                StringBuffer response = new StringBuffer();
-                while((readLine = in.readLine()) != null) {
-                    response.append(readLine);
-                }
-                in.close();
-                System.out.print(response.toString());
-                return new JSONObject(response.toString());
-            }
-            else {
-                return null;
-            }
-        }
 }
 //JPA
