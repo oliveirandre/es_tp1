@@ -12,6 +12,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.springframework.scheduling.annotation.Scheduled;
 import weather.Weather;
 
 /**
@@ -21,6 +22,7 @@ import weather.Weather;
  */
 public class getData {
 
+    @Scheduled(fixedRate = 5000)
     public static Weather getWeatherRequest() throws IOException, JSONException {
 
         // Use the global ID Local to get the parameters about the weather in that City
