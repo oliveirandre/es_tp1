@@ -10,6 +10,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import weather.Weather;
+import model.Quote;
 
 /**
  *
@@ -47,6 +48,7 @@ public class processingData {
         String str = quotes.toString();
         str = str.substring(1, str.length()-1);
         JSONObject object = new JSONObject(str);
+        Quote q = new Quote(object.get("quote").toString(), object.get("author").toString());
         return "    Quote : "+object.get("quote").toString() + " by " + object.get("author").toString();
     }
     public static String getTimeData(String response) throws IOException, JSONException {
