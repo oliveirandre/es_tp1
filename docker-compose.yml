@@ -1,0 +1,31 @@
+version: '3.7'
+services:
+  ES-assignement-service:
+    image: springio/gs-spring-boot-docker
+    ports:
+      - 8080:8080
+    depends_on:
+      - SoftwareEngineering-database
+    networks:
+      ES-network:
+        aliases:
+          - ES-assignement-service
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:mysql://localhost:3307/SoftwareEngineering?autoReconnect=true&useUnicode=true&characterEncoding=UTF-8&allowMultiQueries=true&useSSL=false&verifyServerCertificate=false
+      - SPRING_DATASOURCE_USERNAME=User
+      - SPRING_DATASOURCE_PASSWORD=es
+  SoftwareEngineering-database:
+    image: mysql:latest
+    networks:
+      ES-network:
+        aliases:
+          - SoftwareEngineering-database
+    environment:
+      - MYSQL_ROOT_PASSWORD=es
+      - MYSQL_USER=User
+      - MYSQL_PASSWORD=es
+      - MYSQL_DATABASE=SoftwareEngineering
+    volumes:
+      /var/lib/mysql
+networks:
+  ES-network:

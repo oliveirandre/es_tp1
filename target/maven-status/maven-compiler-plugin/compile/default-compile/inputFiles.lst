@@ -1,3 +1,11 @@
 /home/danielmartins/Documentos/Universidade/ES/Assignment1/es_tp1/src/main/java/hello/Application.java
-/home/danielmartins/Documentos/Universidade/ES/Assignment1/es_tp1/src/main/java/hello/processingData.java
-/home/danielmartins/Documentos/Universidade/ES/Assignment1/es_tp1/src/main/java/hello/getData.java
+/home/danielmartins/Documentos/Universidade/ES/Assignment1/es_tp1/src/main/java/controller/QuotesController.java
+/home/danielmartins/Documentos/Universidade/ES/Assignment1/es_tp1/src/main/java/weather/Weather.java
+/home/danielmartins/Documentos/Universidade/ES/Assignment1/es_tp1/src/main/java/controller/IndexController.java
+/home/danielmartins/Documentos/Universidade/ES/Assignment1/es_tp1/src/main/java/processing/getData.java
+/home/danielmartins/Documentos/Universidade/ES/Assignment1/es_tp1/src/main/java/processing/processingData.java
+/home/danielmartins/Documentos/Universidade/ES/Assignment1/es_tp1/src/main/java/repository/NoteRepository.java
+/home/danielmartins/Documentos/Universidade/ES/Assignment1/es_tp1/src/main/java/exception/ResourceNotFoundException.java
+/home/danielmartins/Documentos/Universidade/ES/Assignment1/es_tp1/src/main/java/controller/WeatherController.java
+/home/danielmartins/Documentos/Universidade/ES/Assignment1/es_tp1/src/main/java/controller/NoteController.java
+/home/danielmartins/Documentos/Universidade/ES/Assignment1/es_tp1/src/main/java/model/Note.java
