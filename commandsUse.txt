@@ -1,18 +1,27 @@
 1. CREATE DOCKER WITH MySQL
 
-creates a MySQL running in a container name SoftwareEngineering. 
-The file system will be mapped on local host c:\\tmp\\mysql
-	It will create "SoftwareEngineering" database on startup.
-	The root password will be "es"
-	It will create an user "User" with password "es"
-	It will export the port 3307 of the container ( default port on mysql is 3306) 
+    creates a MySQL running in a container name SoftwareEngineering. 
+    The file system will be mapped on local host c:\\tmp\\mysql
+            It will create "SoftwareEngineering" database on startup.
+            The root password will be "es"
+            It will create an user "User" with password "es"
+            It will export the port 3307 of the container ( default port on mysql is 3306) 
 
 
--> docker run --name SoftwareEngineering -e MYSQL_ROOT_PASSWORD=es -e MYSQL_DATABASE=SoftwareEngineering -e MYSQL_USER=User -e MYSQL_PASSWORD=es -p 3307:3306 -d mysql:latest
+    -> docker run --name SoftwareEngineering -e MYSQL_ROOT_PASSWORD=es -e MYSQL_DATABASE=SoftwareEngineering -e MYSQL_USER=User -e MYSQL_PASSWORD=es -p 3307:3306 -d mysql:latest
 
 2. ACCESS DATABASE
 
--> docker exec -it SoftwareEngineering bash
--> mysql -u User -p
+    -> docker exec -it SoftwareEngineering bash
+    -> mysql -u User -p
 
 Don't forget : use SoftwareEnginnering;
+
+3. RUN WITH DOCKER-COMPOSE
+
+    The configurations are in docker-compose.yml
+    -> docker-compose up
+
+4. RUN THE PORTAINER
+
+    -> docker run -d -p 9000:9000 -v /var/run/docker.sock:/var/run/docker.sock portainer/portainer

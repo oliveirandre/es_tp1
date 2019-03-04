@@ -1,4 +1,4 @@
-version: '3.7'
+version: '3.3'
 services:
   ES-assignement-service:
     image: springio/gs-spring-boot-docker
@@ -16,6 +16,8 @@ services:
       - SPRING_DATASOURCE_PASSWORD=es
   SoftwareEngineering-database:
     image: mysql:latest
+    ports:
+        - 3307:3306
     networks:
       ES-network:
         aliases:
@@ -26,6 +28,6 @@ services:
       - MYSQL_PASSWORD=es
       - MYSQL_DATABASE=SoftwareEngineering
     volumes:
-      /var/lib/mysql
+      - /var/lib/mysql
 networks:
   ES-network:
