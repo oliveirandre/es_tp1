@@ -8,6 +8,7 @@ package controller;
 import processing.getData;
 import java.io.IOException;
 import org.json.JSONException;
+import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -16,8 +17,10 @@ import org.springframework.web.bind.annotation.RestController;
  * @author danielmartins
  */
 @RestController
+@Controller
 @RequestMapping("/quotes")
 public class QuotesController {
+    
     	@RequestMapping("/quotesAuthorTime")
 	public String quote() throws IOException, JSONException {
             String quote = getData.getQuoteRequest();

@@ -11,6 +11,7 @@ import model.Quote;
  *
  * @author andre
  */
+
 public interface QuoteService {
     
     Quote createQuote(Quote quote);
