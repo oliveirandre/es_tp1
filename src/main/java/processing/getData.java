@@ -13,6 +13,7 @@ import java.net.URL;
 import java.text.ParseException;
 import java.util.HashMap;
 import java.util.Map;
+import model.Quote;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -83,7 +84,7 @@ public class getData {
             return "ERROR"; 
         } //TODO : access the database
     }
-    public static String getQuoteRequest() throws IOException, JSONException {
+    public static Quote getQuoteRequest() throws IOException, JSONException {
         
         //Get the quote based on a category
         URL url = new URL("http://quotes.rest/qod.json?category=management");
@@ -102,7 +103,7 @@ public class getData {
             return processingData.getQuoteData(response.toString());
         }
         else {
-            return "ERROR";
+            return null;
         }
     }
     public static String getTimeRequest() throws IOException, JSONException {

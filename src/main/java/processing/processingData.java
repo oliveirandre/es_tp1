@@ -53,7 +53,7 @@ public class processingData {
 
         return object.toString();
     }
-    public static String getQuoteData(String response) throws IOException, JSONException {
+    public static Quote getQuoteData(String response) throws IOException, JSONException {
         JSONObject json = new JSONObject(response);
         JSONObject contents = new JSONObject(json.get("contents").toString());
         JSONArray quotes = new JSONArray(contents.get("quotes").toString());
@@ -64,7 +64,7 @@ public class processingData {
         str = str.substring(1, str.length()-1);
         JSONObject object = new JSONObject(str);
         Quote q = new Quote(object.get("quote").toString(), object.get("author").toString());
-        return "    Quote : "+object.get("quote").toString() + " by " + object.get("author").toString();
+        return q;
     }
     public static String getTimeData(String response) throws IOException, JSONException {
         JSONObject json = new JSONObject(response);

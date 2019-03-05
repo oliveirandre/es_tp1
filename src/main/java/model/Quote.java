@@ -37,4 +37,11 @@ public class Quote {
         return String.format("Quote{id=%d, quote=%s, author=%s}", id, quote, author);
     }
     
+    public String getQuote() {
+        return this.quote;
+    }
+    
+    public String getAuthor() {
+        return this.author;
+    }
 }
