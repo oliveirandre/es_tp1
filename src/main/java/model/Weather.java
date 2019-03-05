@@ -73,6 +73,36 @@ public class Weather implements Serializable {
     @LastModifiedDate
     private Date updatedAt;
 
+    public Weather(String globalIDLocal, String forecastDate, String idWeatherType, String tMin, String tMax, String classWindSpeed, String classWindDir, String probPrecipita, String latitude, String longitude, Date updatedAt) {
+        this.globalIDLocal = globalIDLocal;
+        this.forecastDate = forecastDate;
+        this.idWeatherType = idWeatherType;
+        this.tMin = tMin;
+        this.tMax = tMax;
+        this.classWindSpeed = classWindSpeed;
+        this.classWindDir = classWindDir;
+        this.probPrecipita = probPrecipita;
+        this.latitude = latitude;
+        this.longitude = longitude;
+        this.updatedAt = updatedAt;
+    }
+
+    public Weather(String globalIDLocal, String forecastDate, String idWeatherType, String tMin, String tMax, String classWindSpeed, String classWindDir, String probPrecipita, String latitude, String longitude, Date createdAt, Date updatedAt) {
+        this.globalIDLocal = globalIDLocal;
+        this.forecastDate = forecastDate;
+        this.idWeatherType = idWeatherType;
+        this.tMin = tMin;
+        this.tMax = tMax;
+        this.classWindSpeed = classWindSpeed;
+        this.classWindDir = classWindDir;
+        this.probPrecipita = probPrecipita;
+        this.latitude = latitude;
+        this.longitude = longitude;
+        this.createdAt = createdAt;
+        this.updatedAt = updatedAt;
+    }
+
+    
     public String getGlobalIDLocal() {
         return globalIDLocal;
     }
@@ -85,11 +115,11 @@ public class Weather implements Serializable {
         return idWeatherType;
     }
 
-    public String gettMin() {
+    public String getTMin() {
         return tMin;
     }
 
-    public String gettMax() {
+    public String getTMax() {
         return tMax;
     }
 
@@ -133,11 +163,11 @@ public class Weather implements Serializable {
         this.idWeatherType = idWeatherType;
     }
 
-    public void settMin(String tMin) {
+    public void setTMin(String tMin) {
         this.tMin = tMin;
     }
 
-    public void settMax(String tMax) {
+    public void setTMax(String tMax) {
         this.tMax = tMax;
     }
 

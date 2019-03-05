@@ -11,7 +11,7 @@ services:
         aliases:
           - ES-assignement-service
     environment:
-      - SPRING_DATASOURCE_URL=jdbc:mysql://localhost:3307/SoftwareEngineering?autoReconnect=true&useUnicode=true&characterEncoding=UTF-8&allowMultiQueries=true&useSSL=false&verifyServerCertificate=false
+      - SPRING_DATASOURCE_URL=jdbc:mysql://localhost:3307/SoftwareEngineering?zeroDateTimeBehavior=convertToNull
       - SPRING_DATASOURCE_USERNAME=User
       - SPRING_DATASOURCE_PASSWORD=es
   SoftwareEngineering-database:

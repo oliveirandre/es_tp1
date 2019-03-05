@@ -6,11 +6,16 @@
 package processing;
 
 import java.io.IOException;
+import java.text.*;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import weather.Weather;
+import model.Weather;
 import model.Quote;
+
 
 /**
  *
@@ -18,18 +23,28 @@ import model.Quote;
  * The class processingData is only for processing the information from the REST API
  */
 public class processingData {
-    public static Weather getWeatherData(String response,String local) throws IOException, JSONException{
-            
+    public static Weather[] getWeatherData(String response,String local) throws IOException, JSONException, ParseException{
         JSONObject ipma = new JSONObject(response);
+        
+        String updateAt;
+        updateAt = ipma.getString("dataUpdate");
+        
         JSONArray d = new JSONArray(ipma.get("data").toString());
         String str = d.toString().substring(1, d.toString().length()-1);
-        JSONObject ob = new JSONObject(str);
-        System.out.print("Weather : "+ob.toString());
-        return new Weather(local,ob.get("tMax").toString(),ob.get("precipitaProb").toString(),ob.get("latitude").toString(),
-                ob.get("idWeatherType").toString(),ob.get("tMin").toString(),ob.get("predWindDir").toString(),
-                ob.get("classWindSpeed").toString(),ob.get("longitude").toString(),ob.get("forecastDate").toString());
+
+        Weather [] w = new Weather[5];
+        for (int i = 0; i < 5; i++) {
+            JSONObject ob = new JSONObject(d.getJSONObject(i).toString());
+            DateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss"); //2018-01-26T09:02:03
+
+            w[i] = new Weather(local,ob.get("forecastDate").toString(),ob.get("idWeatherType").toString(),ob.get("tMin").toString(),ob.get("tMax").toString(),
+                ob.get("classWindSpeed").toString(), ob.get("predWindDir").toString(),ob.get("precipitaProb").toString(),ob.get("latitude").toString(),
+                ob.get("longitude").toString(), format.parse(updateAt));
+        }
+        
+        return w;
     }
-    public static String getLocalIDData(String response) throws IOException, JSONException {
+    public static String getLocalIDData(String response) throws JSONException {
         JSONObject json = new JSONObject(response);
         JSONArray data = new JSONArray(json.get("data").toString());
         String str = data.toString();
@@ -55,5 +70,46 @@ public class processingData {
         JSONObject json = new JSONObject(response);
         String str = json.get("currentDateTime").toString();
         return str;
+    }
+
+////////////////////////////////////////////////////// Funções auxiliares na classificação do Weather ////////////////////////////////
+    
+    ///////////////////////// IDs de cada cidade ///////////////////////////////////////
+    public static Map<Integer,String> getAllCities(String response) throws JSONException 
+    {
+        Map<Integer,String> cities = new HashMap();
+        JSONObject json = new JSONObject(response);
+        JSONArray data = new JSONArray(json.get("data").toString());
+        for (int i = 0; i < data.length(); i++) {
+            JSONObject object = data.getJSONObject(i);
+            cities.put((int)object.get("globalIdLocal"),object.get("local").toString());
+        }
+        return cities;    
+    }
+    
+    ///////////////////////// Classificação do vento ////////////////////////////////////////////
+    public static Map<String,String> getClassWind(String response) throws JSONException
+    {
+        Map<String,String> wind = new HashMap();
+        JSONObject json = new JSONObject(response);
+        JSONArray data = new JSONArray(json.get("data").toString());
+        for (int i = 0; i < data.length(); i++) {
+            JSONObject object = data.getJSONObject(i);
+            wind.put( (String) object.get("classWindSpeed"), (String) object.get("descClassWindSpeedDailyPT"));
+        }
+        return wind; 
+    }
+    
+    ///////////////////////// Lista de identificadores do tempo significativo ////////////////////
+    public static Map<Integer,String> getWeatherType(String response) throws JSONException
+    {
+        Map<Integer,String> type = new HashMap();
+        JSONObject json = new JSONObject(response);
+        JSONArray data = new JSONArray(json.get("data").toString());
+        for (int i = 0; i < data.length(); i++) {
+            JSONObject object = data.getJSONObject(i);
+            type.put( (int) object.get("idWeatherType"), (String) object.get("descIdWeatherTypePT"));
+        }
+        return type; 
     }
 }

@@ -7,15 +7,16 @@ package controller;
 
 import processing.getData;
 import java.io.IOException;
-import java.util.List;
-import model.Note;
+import java.text.ParseException;
+import java.util.Collection;
 import org.json.JSONException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import repository.WeatherRepository;
-import weather.Weather;
+import model.Weather;
 import org.springframework.web.bind.annotation.GetMapping;
+
 
 /**
  *
@@ -27,17 +28,20 @@ public class WeatherController {
    
     @Autowired
     WeatherRepository weatherRepository;
-    
+
+    // Return the Weather for the next 5 days
     @RequestMapping("/test")
-    public String testRESTAPI() throws IOException, JSONException {
-        Weather w = getData.getWeatherRequest();
-        return "    Cidade : "+w.getLocal()+"   Temperatura Máxima : "+w.getTempMax()+"ºC   Temperatura Mínima : "+w.getTempMin()+"ºC";
+    public Weather[] testRESTAPI() throws IOException, JSONException, ParseException {
+        //System.out.print(getData.getClassWindRequest());
+        //System.out.print(getData.getWeatherTypeRequest());
+        return getData.getWeatherRequest();
     }
     
-    // Get All Cities
+    // Return all the cities that have information about the weather
     @GetMapping("/cities")
-    public List<Note> getAllCities() {
-        return weatherRepository.getAllCities();
+    public Collection<String> cities() throws IOException, JSONException {
+        return getData.getCitiesRequest().values();
     }
+    
     
 }

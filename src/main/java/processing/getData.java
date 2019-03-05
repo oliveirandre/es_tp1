@@ -10,10 +10,13 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.text.ParseException;
+import java.util.HashMap;
+import java.util.Map;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.springframework.scheduling.annotation.Scheduled;
-import weather.Weather;
+import model.Weather;
 
 /**
  *
@@ -22,8 +25,10 @@ import weather.Weather;
  */
 public class getData {
 
+    //private final Map<Integer,String> cities = getAllCities();
+    
     @Scheduled(fixedRate = 5000)
-    public static Weather getWeatherRequest() throws IOException, JSONException {
+    public static Weather[] getWeatherRequest() throws IOException, JSONException, ParseException {
 
         // Use the global ID Local to get the parameters about the weather in that City
         String str = getData.getLocalIDRequest();
@@ -34,6 +39,7 @@ public class getData {
         JSONObject object = new JSONObject(str);
         String id = object.get("globalIdLocal").toString();
         URL weather = new URL("http://api.ipma.pt/open-data/forecast/meteorology/cities/daily/"+id+".json"); //Aveiro
+        
         
         HttpURLConnection conn = (HttpURLConnection) weather.openConnection();
         conn.setRequestMethod("GET");
@@ -48,7 +54,6 @@ public class getData {
                 response.append(readLine);
             }
             read.close();
-
             return processingData.getWeatherData(response.toString(),object.get("local").toString());
         } else {
             return null;
@@ -118,6 +123,85 @@ public class getData {
         }
         else {
             return "ERROR";
+        }
+    }
+    
+    
+////////////////////////////////////////////////////// Funções auxiliares na classificação do Weather ////////////////////////////////
+    
+    /////////////// Lista de identificadores para as capitais distrito e ilhass //////////////
+    public static HashMap<Integer,String> getCitiesRequest() throws IOException, JSONException
+    {
+        // GET all the cities
+        URL url = new URL("http://api.ipma.pt/open-data/distrits-islands.json");
+        String readLine = null;
+        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+        connection.setRequestMethod("GET");
+
+        int responseCode = connection.getResponseCode();
+
+        if (responseCode == HttpURLConnection.HTTP_OK) {
+            BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+            StringBuffer response = new StringBuffer();
+
+            while((readLine = in.readLine()) != null) {
+                response.append(readLine);
+            }
+            in.close();
+            return (HashMap<Integer, String>) processingData.getAllCities(response.toString());
+        }
+        else {
+            return new HashMap<Integer,String>();
+        }
+    }
+    
+    ///////////////////////// Lista de classes relativa à intensidade vento ////////////////////
+    public static HashMap<String,String> getClassWindRequest() throws IOException, JSONException
+    {
+        URL url = new URL("http://api.ipma.pt/open-data/wind-speed-daily-classe.json");
+        String readLine = null;
+        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+        connection.setRequestMethod("GET");
+
+        int responseCode = connection.getResponseCode();
+
+        if (responseCode == HttpURLConnection.HTTP_OK) {
+            BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+            StringBuffer response = new StringBuffer();
+
+            while((readLine = in.readLine()) != null) {
+                response.append(readLine);
+            }
+            in.close();
+            return (HashMap<String, String>) processingData.getClassWind(response.toString());
+        }
+        else {
+            return new HashMap<String,String>();
+        }
+    }
+    
+    ///////////////////////// Lista de identificadores do tempo significativo ////////////////////
+    public static HashMap<Integer,String> getWeatherTypeRequest() throws IOException, JSONException
+    {
+        URL url = new URL("http://api.ipma.pt/open-data/weather-type-classe.json");
+        String readLine = null;
+        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+        connection.setRequestMethod("GET");
+
+        int responseCode = connection.getResponseCode();
+
+        if (responseCode == HttpURLConnection.HTTP_OK) {
+            BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+            StringBuffer response = new StringBuffer();
+
+            while((readLine = in.readLine()) != null) {
+                response.append(readLine);
+            }
+            in.close();
+            return (HashMap<Integer, String>) processingData.getWeatherType(response.toString());
+        }
+        else {
+            return new HashMap<Integer,String>();
         }
     }
 }
