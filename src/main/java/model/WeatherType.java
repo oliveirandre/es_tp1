@@ -19,8 +19,28 @@ import javax.validation.constraints.NotBlank;
 @Table(name = "weatherType")
 public class WeatherType implements Serializable {
    @Id
+   @Column(name = "type")
    private String idWeatherType;
    
    @NotBlank
+   @Column(name = "description")
    private String descWeatherType;
+
+    public String getIdWeatherType() {
+        return idWeatherType;
+    }
+
+    public String getDescWeatherType() {
+        return descWeatherType;
+    }
+
+    public void setIdWeatherType(String idWeatherType) {
+        this.idWeatherType = idWeatherType;
+    }
+
+    public void setDescWeatherType(String descWeatherType) {
+        this.descWeatherType = descWeatherType;
+    }
+   
+   
 }

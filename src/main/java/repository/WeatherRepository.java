@@ -5,8 +5,6 @@
  */
 package repository;
 
-import java.util.List;
-import model.Note;
 import model.Weather;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;

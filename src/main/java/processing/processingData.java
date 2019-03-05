@@ -37,9 +37,9 @@ public class processingData {
             JSONObject ob = new JSONObject(d.getJSONObject(i).toString());
             DateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss"); //2018-01-26T09:02:03
 
-            w[i] = new Weather(local,ob.get("forecastDate").toString(),ob.get("idWeatherType").toString(),ob.get("tMin").toString(),ob.get("tMax").toString(),
-                ob.get("classWindSpeed").toString(), ob.get("predWindDir").toString(),ob.get("precipitaProb").toString(),ob.get("latitude").toString(),
-                ob.get("longitude").toString(), format.parse(updateAt));
+            //w[i] = new Weather(local,ob.get("forecastDate").toString(),ob.get("idWeatherType").toString(),ob.get("tMin").toString(),ob.get("tMax").toString(),
+            //    ob.get("classWindSpeed").toString(), ob.get("predWindDir").toString(),ob.get("precipitaProb").toString(),ob.get("latitude").toString(),
+            //    ob.get("longitude").toString(), format.parse(updateAt));
         }
         
         return w;
