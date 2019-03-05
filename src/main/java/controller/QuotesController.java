@@ -7,24 +7,29 @@ package controller;
 
 import processing.getData;
 import java.io.IOException;
+import model.Quote;
 import org.json.JSONException;
-import org.springframework.stereotype.Controller;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import repository.QuoteRepository;
 
 /**
  *
  * @author danielmartins
  */
 @RestController
-@Controller
 @RequestMapping("/quotes")
 public class QuotesController {
     
-    	@RequestMapping("/quotesAuthorTime")
-	public String quote() throws IOException, JSONException {
-            String quote = getData.getQuoteRequest();
-            String time = getData.getTimeRequest();
-            return quote +" "+time;
-	}
+    @Autowired
+    QuoteRepository quoteRepository;
+    
+    @RequestMapping("/quotesAuthorTime")
+    public String quote() throws IOException, JSONException {
+        String quote = getData.getQuoteRequest();
+        String time = getData.getTimeRequest();
+        quoteRepository.save(new Quote("texto","eu"));
+        return quote +" "+time;
+    }
 }
