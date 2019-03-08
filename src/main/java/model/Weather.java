@@ -34,7 +34,12 @@ import javax.validation.constraints.NotBlank;
         allowGetters = true)
 public class Weather implements Serializable {
     @Id
-    @Column(name = "id")
+    @Column(name="id")
+    @GeneratedValue(strategy=GenerationType.AUTO)
+    private Integer id;
+    
+    
+    @Column(name = "local")
     private String globalIDLocal;
 
     @NotBlank
@@ -57,7 +62,7 @@ public class Weather implements Serializable {
     @NotBlank
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "windSpeed", nullable = false)
-    private classWind classWindSpeed;
+    private ClassWind classWindSpeed;
 
     @NotBlank
     @Column(name = "windDir")
@@ -85,7 +90,8 @@ public class Weather implements Serializable {
     @LastModifiedDate
     private Date updatedAt;
 
-    public Weather(String globalIDLocal, String forecastDate, WeatherType idWeatherType, String tMin, String tMax, classWind classWindSpeed, String classWindDir, String probPrecipita, String latitude, String longitude, Date updatedAt) {
+    public Weather(){}
+    public Weather(String globalIDLocal, String forecastDate, WeatherType idWeatherType, String tMin, String tMax, ClassWind classWindSpeed, String classWindDir, String probPrecipita, String latitude, String longitude, Date updatedAt) {
         this.globalIDLocal = globalIDLocal;
         this.forecastDate = forecastDate;
         this.idWeatherType = idWeatherType;
@@ -99,7 +105,7 @@ public class Weather implements Serializable {
         this.updatedAt = updatedAt;
     }
 
-    public Weather(String globalIDLocal, String forecastDate, WeatherType idWeatherType, String tMin, String tMax, classWind classWindSpeed, String classWindDir, String probPrecipita, String latitude, String longitude, Date createdAt, Date updatedAt) {
+    public Weather(String globalIDLocal, String forecastDate, WeatherType idWeatherType, String tMin, String tMax, ClassWind classWindSpeed, String classWindDir, String probPrecipita, String latitude, String longitude, Date createdAt, Date updatedAt) {
         this.globalIDLocal = globalIDLocal;
         this.forecastDate = forecastDate;
         this.idWeatherType = idWeatherType;
@@ -135,7 +141,7 @@ public class Weather implements Serializable {
         return tMax;
     }
 
-    public classWind getClassWindSpeed() {
+    public ClassWind getClassWindSpeed() {
         return classWindSpeed;
     }
 
@@ -183,7 +189,7 @@ public class Weather implements Serializable {
         this.tMax = tMax;
     }
 
-    public void setClassWindSpeed(classWind classWindSpeed) {
+    public void setClassWindSpeed(ClassWind classWindSpeed) {
         this.classWindSpeed = classWindSpeed;
     }
 
@@ -205,6 +211,11 @@ public class Weather implements Serializable {
 
     public void setUpdatedAt(Date updatedAt) {
         this.updatedAt = updatedAt;
+    }
+
+    @Override
+    public String toString() {
+        return "Weather{" + "globalIDLocal=" + globalIDLocal + ", forecastDate=" + forecastDate + ", idWeatherType=" + idWeatherType.toString() + ", tMin=" + tMin + ", tMax=" + tMax + ", classWindSpeed=" + classWindSpeed.toString() + ", classWindDir=" + classWindDir + ", probPrecipita=" + probPrecipita + ", latitude=" + latitude + ", longitude=" + longitude + ", createdAt=" + createdAt + ", updatedAt=" + updatedAt + '}';
     }
     
     

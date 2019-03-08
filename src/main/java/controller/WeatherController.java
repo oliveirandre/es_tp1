@@ -25,16 +25,12 @@ import org.springframework.web.bind.annotation.GetMapping;
 @RestController
 @RequestMapping("/weather")
 public class WeatherController {
-   
-    @Autowired
-    WeatherRepository weatherRepository;
 
     // Return the Weather for the next 5 days
     @RequestMapping("/test")
     public Weather[] testRESTAPI() throws IOException, JSONException, ParseException {
-        //System.out.print(getData.getClassWindRequest());
-        //System.out.print(getData.getWeatherTypeRequest());
-        return getData.getWeatherRequest();
+        Weather[] weather = getData.getWeatherRequest();
+        return weather;
     }
     
     // Return all the cities that have information about the weather

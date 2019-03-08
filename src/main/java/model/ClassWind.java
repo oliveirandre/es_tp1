@@ -17,7 +17,7 @@ import javax.validation.constraints.NotBlank;
  */
 @Entity
 @Table(name = "classWind")
-public class classWind implements Serializable {
+public class ClassWind implements Serializable {
     @Id
     @Column(name = "windSpeed")
     private String classWindSpeed;
@@ -25,6 +25,12 @@ public class classWind implements Serializable {
     @NotBlank
     @Column(name = "description")
     private String descClassWindSpeed;
+
+    public ClassWind(String classWindSpeed, String descClassWindSpeed) {
+        this.classWindSpeed = classWindSpeed;
+        this.descClassWindSpeed = descClassWindSpeed;
+    }
+    
 
     public String getClassWindSpeed() {
         return classWindSpeed;
@@ -40,6 +46,11 @@ public class classWind implements Serializable {
 
     public void setDescClassWindSpeed(String descClassWindSpeed) {
         this.descClassWindSpeed = descClassWindSpeed;
+    }
+
+    @Override
+    public String toString() {
+        return "ClassWind{" + "classWindSpeed=" + classWindSpeed + ", descClassWindSpeed=" + descClassWindSpeed + '}';
     }
     
     

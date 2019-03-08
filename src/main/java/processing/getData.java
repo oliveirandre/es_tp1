@@ -12,12 +12,14 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.text.ParseException;
 import java.util.HashMap;
-import java.util.Map;
 import model.Quote;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.springframework.scheduling.annotation.Scheduled;
 import model.Weather;
+import org.springframework.beans.factory.annotation.Autowired;
+import repository.WeatherRepository;
+import repository.WeatherTypeRepository;
 
 /**
  *
@@ -26,9 +28,12 @@ import model.Weather;
  */
 public class getData {
 
-    //private final Map<Integer,String> cities = getAllCities();
+    @Autowired
+    WeatherRepository weatherRepository;
     
-    @Scheduled(fixedRate = 5000)
+    @Autowired
+    WeatherTypeRepository weatherTypeRepository;
+    
     public static Weather[] getWeatherRequest() throws IOException, JSONException, ParseException {
 
         // Use the global ID Local to get the parameters about the weather in that City

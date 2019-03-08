@@ -26,6 +26,11 @@ public class WeatherType implements Serializable {
    @Column(name = "description")
    private String descWeatherType;
 
+    public WeatherType(String idWeatherType, String descWeatherType) {
+        this.idWeatherType = idWeatherType;
+        this.descWeatherType = descWeatherType;
+    }
+
     public String getIdWeatherType() {
         return idWeatherType;
     }
@@ -40,6 +45,11 @@ public class WeatherType implements Serializable {
 
     public void setDescWeatherType(String descWeatherType) {
         this.descWeatherType = descWeatherType;
+    }
+
+    @Override
+    public String toString() {
+        return "WeatherType{" + "idWeatherType=" + idWeatherType + ", descWeatherType=" + descWeatherType + '}';
     }
    
    
