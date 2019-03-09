@@ -15,6 +15,7 @@ import java.util.ArrayList;
 import java.util.Random;
 import model.City;
 import model.ClassWind;
+import model.Image;
 import model.Quote;
 import org.json.JSONException;
 import model.Weather;
@@ -32,10 +33,24 @@ import repository.QuoteRepository;
  */
 @Component
 public class getData {
+
+    private static WeatherRepository weatherRepository;
+    private static WeatherTypeRepository weatherTypeRepository;
+    private static CityRepository cityRepository;
+    private static ClassWindRepository classWindRepository;
     
-    public static ArrayList<Weather> getWeatherRequest(WeatherRepository we, ClassWindRepository c,WeatherTypeRepository wt,CityRepository ci, String local, String localId) throws IOException, JSONException, ParseException {
+    public getData(WeatherRepository we, ClassWindRepository cw,WeatherTypeRepository wt,CityRepository ci) {
+        this.weatherRepository = we;
+        this.classWindRepository = cw;
+        this.weatherTypeRepository = wt;
+        this.cityRepository = ci;
+    }
+    
+    
+    public static ArrayList<Weather> getWeatherRequest(String local, String localId) throws IOException, JSONException, ParseException {
         
         ArrayList<Weather> w = new ArrayList<>();
+        processingData pd = new processingData(weatherRepository,classWindRepository,weatherTypeRepository,cityRepository);
         
         try{
             URL weather = new URL("http://api.ipma.pt/open-data/forecast/meteorology/cities/daily/"+localId+".json"); //Aveiro
@@ -54,9 +69,9 @@ public class getData {
                         response.append(readLine);
                     }
                 }
-                w = processingData.getWeatherData(response.toString(),local,we,c,wt,ci);
+                w = pd.getWeatherData(response.toString(),local);
             } else { // Get the data from database
-                w = (ArrayList<Weather>) we.getWeatherFromALocal(local);
+                w = (ArrayList<Weather>) weatherRepository.getWeatherFromALocal(local);
             }       
         }catch(JSONException | IOException | ParseException e){
             System.err.println(e);

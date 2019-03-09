@@ -32,22 +32,23 @@ import repository.WeatherTypeRepository;
  */
 @Component
 public class processingData {
+
+    private static WeatherRepository weatherRepository;
+    private static WeatherTypeRepository weatherTypeRepository;
+    private static CityRepository cityRepository;
+    private static ClassWindRepository classWindRepository;
     
-    public static ArrayList<Weather> getWeatherData(String response, String local, WeatherRepository weatherRepository, ClassWindRepository classWindRepository, WeatherTypeRepository weatherTypeRepository, CityRepository cityRepository) throws IOException, JSONException, ParseException{
+    public processingData(WeatherRepository weatherRepository, ClassWindRepository classWindRepository, WeatherTypeRepository weatherTypeRepository, CityRepository cityRepository) {
+        this.weatherRepository = weatherRepository;
+        this.classWindRepository = classWindRepository;
+        this.weatherTypeRepository = weatherTypeRepository;
+        this.cityRepository = cityRepository;
+    }
+    
+    
+    public static ArrayList<Weather> getWeatherData(String response, String local) throws IOException, JSONException, ParseException{
         JSONObject ipma = new JSONObject(response);
-        
-        String updateAt = "";
-        String forecastDate = "";
-        String idWeatherType = "";
-        String descType = "";
-        String tMin = "";
-        String tMax = "";
-        String classWindSpeed = "";
-        String descWind = "";
-        String predWindDir = "";
-        String precipitaProb = "";
-        String latitude = "";
-        String longitude = "";
+
         JSONArray d = new JSONArray(ipma.get("data").toString());
         String str = d.toString().substring(1, d.toString().length()-1);
 
@@ -70,23 +71,24 @@ public class processingData {
             }
             for (int i = 0; i < d.length(); i++ ) {
                 JSONObject ob = new JSONObject(d.getJSONObject(i).toString());
-                updateAt = ipma.getString("dataUpdate");
+                String updateAt = ipma.getString("dataUpdate");
                 String idLocal = cityRepository.getId(local);
                 System.out.println("Result (processing Data) : "+idLocal);
-                forecastDate = ob.get("forecastDate").toString() instanceof String ? ob.get("forecastDate").toString() : ""; 
-                idWeatherType = ob.get("idWeatherType").toString() instanceof String ? ob.get("idWeatherType").toString() : "";
-                descType = weatherTypeRepository.getDescription(idWeatherType);
-                tMin = ob.get("tMin").toString() instanceof String ? ob.get("tMin").toString() : "";
-                tMax = ob.get("tMax").toString() instanceof String ? ob.get("tMax").toString() : "";
-                classWindSpeed = ob.get("classWindSpeed").toString() instanceof String ? ob.get("classWindSpeed").toString() : "";
-                descWind = classWindRepository.getDescription(classWindSpeed);
-                predWindDir = ob.get("predWindDir").toString() instanceof String ? ob.get("predWindDir").toString() : "";
-                precipitaProb = ob.get("precipitaProb").toString() instanceof String ? ob.get("precipitaProb").toString() : "";
-                latitude = ob.get("latitude").toString() instanceof String ? ob.get("latitude").toString() : "";
-                longitude = ob.get("longitude").toString() instanceof String ? ob.get("longitude").toString() : "";
+                String forecastDate; 
+                forecastDate = ob.get("forecastDate").toString() instanceof String ? ob.get("forecastDate").toString() : "";
+                String idWeatherType = ob.get("idWeatherType").toString() instanceof String ? ob.get("idWeatherType").toString() : "";
+                String descType = weatherTypeRepository.getDescription(idWeatherType);
+                String tMin = ob.get("tMin").toString() instanceof String ? ob.get("tMin").toString() : "";
+                String tMax = ob.get("tMax").toString() instanceof String ? ob.get("tMax").toString() : "";
+                String classWindSpeed = ob.get("classWindSpeed").toString() instanceof String ? ob.get("classWindSpeed").toString() : "";
+                String descWind = classWindRepository.getDescription(classWindSpeed);
+                String predWindDir = ob.get("predWindDir").toString() instanceof String ? ob.get("predWindDir").toString() : "";
+                String precipitaProb = ob.get("precipitaProb").toString() instanceof String ? ob.get("precipitaProb").toString() : "";
+                String latitude = ob.get("latitude").toString() instanceof String ? ob.get("latitude").toString() : "";
+                String longitude = ob.get("longitude").toString() instanceof String ? ob.get("longitude").toString() : "";
                 weather.add( new Weather(new City(idLocal,local),forecastDate,new WeatherType(idWeatherType,descType),tMin,tMax,new ClassWind(classWindSpeed,descWind),predWindDir,precipitaProb,latitude,longitude,createdAt, format.parse(updateAt)) );
             }
-        }catch(Exception e){
+        }catch(ParseException | JSONException e){
             System.err.println("Something's wrong processing the data. Error : "+e);
         }
 

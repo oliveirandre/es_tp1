@@ -67,12 +67,16 @@ public class WeatherController {
     // Return the Weather for the next 5 days
     @RequestMapping("/{local}")
     public String testRESTAPI(@PathVariable(value = "local") String Local) throws IOException, JSONException, ParseException {
+        getData g = new getData(weatherRepository,classWindRepository,weatherTypeRepository, cityRepository);
         local = Local;
         localID = cityRepository.getId(local);
         if(localID == null){
             return "No results about "+local;
         }
-        ArrayList<Weather> weather = getData.getWeatherRequest(weatherRepository,classWindRepository,weatherTypeRepository,cityRepository, local, localID);
+        //keywords = "nature,water" for example
+        //Go to search a random Image "https://source.unsplash.com/1600x900/?"+keywords
+        
+        ArrayList<Weather> weather = g.getWeatherRequest(local, localID);
         weather.forEach((w) -> {weatherRepository.saveAndFlush(w);});
         String result = "";
         result = weather.stream().map((s) -> s.toString()+"\n").reduce(result, String::concat);
@@ -89,8 +93,9 @@ public class WeatherController {
     //@Scheduled(fixed=5000) //Update the database every 5000 milliseconds ->> this shouldn't be uncommented, this is just to show to the teacher that works
     public void getWeather() throws IOException, JSONException, ParseException
     {
-        System.out.println("Updated database : "+ dateFormat.format(new Date()));
-        getData.getWeatherRequest(weatherRepository,classWindRepository,weatherTypeRepository, cityRepository, local,localID);
+        System.out.println("\n Updated database : "+ dateFormat.format(new Date())+"\n");
+        getData g = new getData(weatherRepository,classWindRepository,weatherTypeRepository, cityRepository);
+        getData.getWeatherRequest(local,localID);
     }
     
 }
