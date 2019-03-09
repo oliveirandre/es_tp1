@@ -7,8 +7,6 @@ package model;
 
 import java.io.Serializable;
 import javax.persistence.*;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.Size;
 
 /**
  *
@@ -21,10 +19,9 @@ import javax.validation.constraints.Size;
 public class ClassWind implements Serializable {
     @Id
     @Column(name = "wind_speed")
-    @Size(min = 1, max = 100)
     private String classWindSpeed;
     
-    @Column(name = "description")
+    @Column(name = "[description]")  
     private String descClassWindSpeed;
 
     public ClassWind(String classWindSpeed, String descClassWindSpeed) {

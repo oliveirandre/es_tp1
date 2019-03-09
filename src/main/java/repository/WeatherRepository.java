@@ -25,20 +25,33 @@ public interface WeatherRepository extends JpaRepository<Weather, Long> {
     /**
      *
      * @param local
-     * @return the local if exist in database
+     * @return number of entries in database given the local
      */
-    @Query("SELECT w.globalIDLocal FROM Weather w WHERE w.globalIDLocal=(:local)")
-    public List<String> checkLocal(@Param("local") String local);
+    @Query("SELECT COUNT(w.globalIDLocal) FROM Weather w WHERE w.globalIDLocal IN (SELECT c FROM City c WHERE c.City = :local)")
+    public Long checkLocal(@Param("local") String local);
     
     /**
      * @param local
      */
     @Transactional
     @Modifying
-    @Query("DELETE FROM Weather e where e.globalIDLocal=:local")
+    @Query("DELETE FROM Weather e WHERE e.globalIDLocal IN (SELECT c FROM City c WHERE c.City = :local)")
     public void deleteLocal(@Param("local") String local); 
     
-    @Query("SELECT w.createdAt FROM Weather w WHERE w.globalIDLocal=(:local)")
+    /**
+     *
+     * @param local
+     * @return Date's list when weather's entries was created
+     */
+    @Query("SELECT w.createdAt FROM Weather w WHERE w.globalIDLocal IN (SELECT c FROM City c WHERE c.City = :local)")
     public List<Date> createData(@Param("local") String local);
+    
+    /**
+     *
+     * @param local
+     * @return Weather's list of a place
+     */
+    @Query("SELECT w FROM Weather w WHERE w.globalIDLocal IN (SELECT c FROM City c WHERE c.City = :local)")
+    public List<Weather> getWeatherFromALocal(@Param("local") String local);
     
 }

@@ -10,22 +10,21 @@ import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Date;
-import java.util.HashMap;
-import model.ClassWind;
+import model.City;
 import org.json.JSONException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import repository.WeatherRepository;
 import model.Weather;
-import model.WeatherType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
+import repository.CityRepository;
 import repository.ClassWindRepository;
 import repository.WeatherTypeRepository;
 
@@ -47,6 +46,12 @@ public class WeatherController {
     @Autowired
     ClassWindRepository classWindRepository;
     
+    @Autowired
+    CityRepository cityRepository;
+    
+    private String local = "Aveiro"; //Default
+    private String localID = "1010500"; //Default
+    
     private static final Logger log = LoggerFactory.getLogger(getData.class);
 
     private static final SimpleDateFormat dateFormat = new SimpleDateFormat("HH:mm:ss");
@@ -55,20 +60,29 @@ public class WeatherController {
     public void getInformations() throws IOException, JSONException{
         getData.getWeatherTypeRequest().forEach((weather) -> {weatherTypeRepository.saveAndFlush(weather);});
         getData.getClassWindRequest().forEach((wind) -> {classWindRepository.saveAndFlush(wind);});
+        getData.getCitiesRequest().forEach((city) -> {cityRepository.saveAndFlush(city);});
+        
     }
     
     // Return the Weather for the next 5 days
-    @RequestMapping("/test")
-    public ArrayList<Weather> testRESTAPI() throws IOException, JSONException, ParseException {
-        ArrayList<Weather> weather = getData.getWeatherRequest(weatherRepository,classWindRepository,weatherTypeRepository);
+    @RequestMapping("/{local}")
+    public String testRESTAPI(@PathVariable(value = "local") String Local) throws IOException, JSONException, ParseException {
+        local = Local;
+        localID = cityRepository.getId(local);
+        if(localID == null){
+            return "No results about "+local;
+        }
+        ArrayList<Weather> weather = getData.getWeatherRequest(weatherRepository,classWindRepository,weatherTypeRepository,cityRepository, local, localID);
         weather.forEach((w) -> {weatherRepository.saveAndFlush(w);});
-        return weather;
+        String result = "";
+        result = weather.stream().map((s) -> s.toString()+"\n").reduce(result, String::concat);
+        return result;
     }
     
     // Return all the cities that have information about the weather
     @GetMapping("/cities")
-    public Collection<String> cities() throws IOException, JSONException {
-        return getData.getCitiesRequest().values();
+    public ArrayList<City> cities() throws IOException, JSONException {
+        return getData.getCitiesRequest();
     }
     
     @Scheduled(cron="0 0/5 * * * ?") //Update the database every 5 minutes
@@ -76,7 +90,7 @@ public class WeatherController {
     public void getWeather() throws IOException, JSONException, ParseException
     {
         System.out.println("Updated database : "+ dateFormat.format(new Date()));
-        getData.getWeatherRequest(weatherRepository,classWindRepository,weatherTypeRepository);
+        getData.getWeatherRequest(weatherRepository,classWindRepository,weatherTypeRepository, cityRepository, local,localID);
     }
     
 }

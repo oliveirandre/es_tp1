@@ -9,9 +9,8 @@ import java.io.IOException;
 import java.text.*;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
+import model.City;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -20,6 +19,7 @@ import model.Quote;
 import model.WeatherType;
 import model.ClassWind;
 import org.springframework.stereotype.Component;
+import repository.CityRepository;
 import repository.ClassWindRepository;
 import repository.WeatherRepository;
 import repository.WeatherTypeRepository;
@@ -33,7 +33,7 @@ import repository.WeatherTypeRepository;
 @Component
 public class processingData {
     
-    public static ArrayList<Weather> getWeatherData(String response,String local,WeatherRepository w, ClassWindRepository classWindRepository,WeatherTypeRepository weatherTypeRepository) throws IOException, JSONException, ParseException{
+    public static ArrayList<Weather> getWeatherData(String response, String local, WeatherRepository weatherRepository, ClassWindRepository classWindRepository, WeatherTypeRepository weatherTypeRepository, CityRepository cityRepository) throws IOException, JSONException, ParseException{
         JSONObject ipma = new JSONObject(response);
         
         String updateAt = "";
@@ -51,24 +51,28 @@ public class processingData {
         JSONArray d = new JSONArray(ipma.get("data").toString());
         String str = d.toString().substring(1, d.toString().length()-1);
 
-        List<String> checkLocal = w.checkLocal(local);
+        Long checkLocal = weatherRepository.checkLocal(local);
         ArrayList<Weather> weather = new ArrayList<>();
         DateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss"); //2018-01-26T09:02:03
         SimpleDateFormat sdfDate = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss"); 
         try{
             Date createdAt;
-            if(checkLocal != null){ //Data to update the database
-                List<Date> l = w.createData(local);
+            if(checkLocal > 0){ //Data to update the database
+                System.out.println("Database has entries about "+local);
+                List<Date> l = weatherRepository.createData(local);
                 createdAt = l.get(0);
-                w.deleteLocal(local);
+                weatherRepository.deleteLocal(local);     
             }else { //Data to create a new information in database           
+                System.out.println("Database don't have entries about "+local);                
                 Date now = new Date();
                 String n = sdfDate.format(now);
-                createdAt = sdfDate.parse(n);                  
+                createdAt = sdfDate.parse(n);
             }
             for (int i = 0; i < d.length(); i++ ) {
                 JSONObject ob = new JSONObject(d.getJSONObject(i).toString());
                 updateAt = ipma.getString("dataUpdate");
+                String idLocal = cityRepository.getId(local);
+                System.out.println("Result (processing Data) : "+idLocal);
                 forecastDate = ob.get("forecastDate").toString() instanceof String ? ob.get("forecastDate").toString() : ""; 
                 idWeatherType = ob.get("idWeatherType").toString() instanceof String ? ob.get("idWeatherType").toString() : "";
                 descType = weatherTypeRepository.getDescription(idWeatherType);
@@ -80,13 +84,13 @@ public class processingData {
                 precipitaProb = ob.get("precipitaProb").toString() instanceof String ? ob.get("precipitaProb").toString() : "";
                 latitude = ob.get("latitude").toString() instanceof String ? ob.get("latitude").toString() : "";
                 longitude = ob.get("longitude").toString() instanceof String ? ob.get("longitude").toString() : "";
-                weather.add( new Weather(local,forecastDate,new WeatherType(idWeatherType,descType),tMin,tMax,new ClassWind(classWindSpeed,descWind),predWindDir,precipitaProb,latitude,longitude,createdAt, format.parse(updateAt)) );
+                weather.add( new Weather(new City(idLocal,local),forecastDate,new WeatherType(idWeatherType,descType),tMin,tMax,new ClassWind(classWindSpeed,descWind),predWindDir,precipitaProb,latitude,longitude,createdAt, format.parse(updateAt)) );
             }
         }catch(Exception e){
             System.err.println("Something's wrong processing the data. Error : "+e);
         }
 
-        weather.forEach((we) -> {w.saveAndFlush(we);});
+        weather.forEach((we) -> {weatherRepository.saveAndFlush(we);});
         return weather;
     }
     public static String getLocalIDData(String response) throws JSONException {
@@ -120,14 +124,14 @@ public class processingData {
 ////////////////////////////////////////////////////// Funções auxiliares na classificação do Weather ////////////////////////////////
     
     ///////////////////////// IDs de cada cidade ///////////////////////////////////////
-    public static Map<Integer,String> getAllCities(String response) throws JSONException 
+    public static ArrayList<City> getAllCities(String response) throws JSONException 
     {
-        Map<Integer,String> cities = new HashMap();
+        ArrayList<City> cities = new ArrayList<>();
         JSONObject json = new JSONObject(response);
         JSONArray data = new JSONArray(json.get("data").toString());
         for (int i = 0; i < data.length(); i++) {
             JSONObject object = data.getJSONObject(i);
-            cities.put((int)object.get("globalIdLocal"),object.get("local").toString());
+            cities.add(new City(object.get("globalIdLocal").toString(),object.get("local").toString()));
         }
         return cities;    
     }
@@ -137,11 +141,9 @@ public class processingData {
     {
         ArrayList<ClassWind> wind = new ArrayList<>();
         JSONObject json = new JSONObject(response);
-        System.err.println("Json : "+json);
         JSONArray data = new JSONArray(json.get("data").toString());
         for (int i = 0; i < data.length(); i++) {
             JSONObject object = data.getJSONObject(i);
-            System.out.println("Object Wind : "+object);
             wind.add( new ClassWind( String.valueOf(object.get("classWindSpeed")), (String) object.get("descClassWindSpeedDailyPT")));
         }
         return wind; 
@@ -155,7 +157,6 @@ public class processingData {
         JSONArray data = new JSONArray(json.get("data").toString());
         for (int i = 0; i < data.length(); i++) {
             JSONObject object = data.getJSONObject(i);
-            System.err.println("Object : "+object);
             type.add( new WeatherType( String.valueOf(object.get("idWeatherType")), (String) object.get("descIdWeatherTypePT")));
         }
         return type; 

@@ -15,11 +15,11 @@ import javax.validation.constraints.Size;
  * @author danielmartins
  */
 @Entity
-@Table(name = "image")
+@Table(name = "image", schema="ES")
 public class Image implements Serializable {
     @Id
-    @Size(min = 1, max = 100)
-    private String imageID;
+    @GeneratedValue(strategy=GenerationType.AUTO)
+    private int imageID;
     
     @NotBlank
     private String pathImage;
@@ -27,21 +27,17 @@ public class Image implements Serializable {
     public Image() {
     }
 
-    public Image(String imageID, String pathImage) {
+    public Image(int imageID, String pathImage) {
         this.imageID = imageID;
         this.pathImage = pathImage;
     }
 
-    public String getImageID() {
+    public int getImageID() {
         return imageID;
     }
 
     public String getPathImage() {
         return pathImage;
-    }
-
-    public void setImageID(String imageID) {
-        this.imageID = imageID;
     }
 
     public void setPathImage(String pathImage) {

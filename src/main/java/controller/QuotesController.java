@@ -27,7 +27,7 @@ public class QuotesController {
     
     @RequestMapping("/quotesAuthorTime")
     public String quote() throws IOException, JSONException {
-        Quote quote = getData.getQuoteRequest();
+        Quote quote = getData.getQuoteRequest(quoteRepository);
         String time = getData.getTimeRequest();
         quoteRepository.save(new Quote(quote.getQuote(), quote.getAuthor()));
         return quote +" "+time;

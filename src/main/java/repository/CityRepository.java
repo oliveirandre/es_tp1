@@ -5,7 +5,7 @@
  */
 package repository;
 
-import model.Quote;
+import model.City;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -17,20 +17,8 @@ import org.springframework.stereotype.Repository;
  */
 
 @Repository
-public interface QuoteRepository extends JpaRepository<Quote, Long> {
-
-    /**
-     *
-     * @param number
-     * @return Quote, given a number
-     */
-    @Query("SELECT q FROM Quote q WHERE q.quote_id=(:number)")
-    public Quote getQuote(@Param("number") int number);
+public interface CityRepository extends JpaRepository<City, Long> {
     
-    /**
-     *
-     * @return the number of entries in table Quote
-     */
-    @Query("SELECT COUNT(q) FROM Quote q")
-    public int size();
+    @Query("SELECT c.id_city FROM City c WHERE c.City=(:local) ")
+    public String getId(@Param("local") String local);
 }

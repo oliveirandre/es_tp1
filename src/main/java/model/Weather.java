@@ -9,9 +9,11 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import java.io.Serializable;
 import java.util.Date;
 import javax.persistence.*;
+import javax.validation.constraints.Min;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Size;
 
 /**
  *
@@ -35,45 +37,55 @@ import javax.validation.constraints.NotBlank;
 public class Weather implements Serializable {
     @Id
     @Column(name="id")
+    @Min(1)
     @GeneratedValue(strategy=GenerationType.AUTO)
     private Integer id;
     
-    @NotBlank
-    @Column(name = "local")
-    private String globalIDLocal;
+    @ManyToOne
+    @JoinColumn(name="id_city",nullable=false, columnDefinition = "text")
+    private City globalIDLocal;
 
     @NotBlank
     @Column(name = "forecastDate")
+    @Size(min = 1, max = 255)
     private String forecastDate;
     
-    @JoinColumn(name = "weatherType", nullable = false)
+    @ManyToOne    
+    @JoinColumn(name = "weatherType", nullable = false, columnDefinition = "text")
     private WeatherType idWeatherType;
     
     @NotBlank
     @Column(name = "min")
+    @Size(min = 1, max = 255)
     private String tMin;
 
     @NotBlank
     @Column(name = "max")
+    @Size(min = 1, max = 255)
     private String tMax;
     
-    @JoinColumn(name = "wind_speed", nullable = false)
+    @ManyToOne   
+    @JoinColumn(name = "wind_speed", nullable = false, columnDefinition = "text")
     private ClassWind classWindSpeed;
 
     @NotBlank
     @Column(name = "windDir")
+    @Size(min = 1, max = 255)
     private String classWindDir;
     
     @NotBlank
     @Column(name = "probPrec")
+    @Size(min = 1, max = 255)
     private String probPrecipita;
 
     @NotBlank
     @Column(name = "latitude")
+    @Size(min = 1, max = 255)
     private String latitude;
     
     @NotBlank
     @Column(name = "longitude")
+    @Size(min = 1, max = 255)
     private String longitude;
     
     @Column(nullable = false, updatable = false)
@@ -87,7 +99,7 @@ public class Weather implements Serializable {
     private Date updatedAt;
 
     public Weather(){}
-    public Weather(String globalIDLocal, String forecastDate, WeatherType idWeatherType, String tMin, String tMax, ClassWind classWindSpeed, String classWindDir, String probPrecipita, String latitude, String longitude, Date updatedAt) {
+    public Weather(City globalIDLocal, String forecastDate, WeatherType idWeatherType, String tMin, String tMax, ClassWind classWindSpeed, String classWindDir, String probPrecipita, String latitude, String longitude, Date updatedAt) {
         this.globalIDLocal = globalIDLocal;
         this.forecastDate = forecastDate;
         this.idWeatherType = idWeatherType;
@@ -101,7 +113,7 @@ public class Weather implements Serializable {
         this.updatedAt = updatedAt;
     }
 
-    public Weather(String globalIDLocal, String forecastDate, WeatherType idWeatherType, String tMin, String tMax, ClassWind classWindSpeed, String classWindDir, String probPrecipita, String latitude, String longitude, Date createdAt, Date updatedAt) {
+    public Weather(City globalIDLocal, String forecastDate, WeatherType idWeatherType, String tMin, String tMax, ClassWind classWindSpeed, String classWindDir, String probPrecipita, String latitude, String longitude, Date createdAt, Date updatedAt) {
         this.globalIDLocal = globalIDLocal;
         this.forecastDate = forecastDate;
         this.idWeatherType = idWeatherType;
@@ -120,7 +132,7 @@ public class Weather implements Serializable {
         return id;
     }
     
-    public String getGlobalIDLocal() {
+    public City getGlobalIDLocal() {
         return globalIDLocal;
     }
 
@@ -168,7 +180,7 @@ public class Weather implements Serializable {
         return updatedAt;
     }
     
-    public void setGlobalIDLocal(String globalIDLocal) {
+    public void setGlobalIDLocal(City globalIDLocal) {
         this.globalIDLocal = globalIDLocal;
     }
 
@@ -214,7 +226,7 @@ public class Weather implements Serializable {
 
     @Override
     public String toString() {
-        return "Weather{" + "globalIDLocal=" + globalIDLocal + ", forecastDate=" + forecastDate + ", idWeatherType=" + idWeatherType.toString() + ", tMin=" + tMin + ", tMax=" + tMax + ", classWindSpeed=" + classWindSpeed.toString() + ", classWindDir=" + classWindDir + ", probPrecipita=" + probPrecipita + ", latitude=" + latitude + ", longitude=" + longitude + ", createdAt=" + createdAt + ", updatedAt=" + updatedAt + '}';
+        return "Weather{" + "globalIDLocal=" + globalIDLocal.toString() + ", forecastDate=" + forecastDate + ", idWeatherType=" + idWeatherType.toString() + ", tMin=" + tMin + ", tMax=" + tMax + ", classWindSpeed=" + classWindSpeed.toString() + ", classWindDir=" + classWindDir + ", probPrecipita=" + probPrecipita + ", latitude=" + latitude + ", longitude=" + longitude + ", createdAt=" + createdAt + ", updatedAt=" + updatedAt + '}';
     }
     
     

@@ -12,18 +12,19 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.text.ParseException;
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.Random;
+import model.City;
 import model.ClassWind;
 import model.Quote;
 import org.json.JSONException;
-import org.json.JSONObject;
 import model.Weather;
 import model.WeatherType;
 import repository.ClassWindRepository;
 import repository.WeatherRepository;
 import repository.WeatherTypeRepository;
-import java.util.Date;
 import org.springframework.stereotype.Component;
+import repository.CityRepository;
+import repository.QuoteRepository;
 /**
  *
  * @author danielmartins
@@ -32,19 +33,12 @@ import org.springframework.stereotype.Component;
 @Component
 public class getData {
     
-    public static ArrayList<Weather> getWeatherRequest(WeatherRepository we, ClassWindRepository c,WeatherTypeRepository wt) throws IOException, JSONException, ParseException {
+    public static ArrayList<Weather> getWeatherRequest(WeatherRepository we, ClassWindRepository c,WeatherTypeRepository wt,CityRepository ci, String local, String localId) throws IOException, JSONException, ParseException {
         
-        ArrayList<Weather> w = new ArrayList<Weather>();
-        // Use the global ID Local to get the parameters about the weather in that City
-        String str = getData.getLocalIDRequest();
-        if (str.equals("ERROR")){
-            return null;
-        }
+        ArrayList<Weather> w = new ArrayList<>();
         
         try{
-            JSONObject object = new JSONObject(str);
-            String id = object.get("globalIdLocal").toString();
-            URL weather = new URL("http://api.ipma.pt/open-data/forecast/meteorology/cities/daily/"+id+".json"); //Aveiro
+            URL weather = new URL("http://api.ipma.pt/open-data/forecast/meteorology/cities/daily/"+localId+".json"); //Aveiro
 
 
             HttpURLConnection conn = (HttpURLConnection) weather.openConnection();
@@ -60,58 +54,43 @@ public class getData {
                         response.append(readLine);
                     }
                 }
-                w = processingData.getWeatherData(response.toString(),object.get("local").toString(),we,c,wt);
-            }        
+                w = processingData.getWeatherData(response.toString(),local,we,c,wt,ci);
+            } else { // Get the data from database
+                w = (ArrayList<Weather>) we.getWeatherFromALocal(local);
+            }       
         }catch(JSONException | IOException | ParseException e){
             System.err.println(e);
         }
         return w;
     }
-    public static String getLocalIDRequest() throws IOException, JSONException {
-        
-        // GET the global ID Local from a Portuguese City
-        URL url = new URL("http://api.ipma.pt/open-data/distrits-islands.json");
-        String readLine = null;
-        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-        connection.setRequestMethod("GET");
-
-        int responseCode = connection.getResponseCode();
-
-        if (responseCode == HttpURLConnection.HTTP_OK) {
-            BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream()));
-            StringBuffer response = new StringBuffer();
-
-            while((readLine = in.readLine()) != null) {
-                response.append(readLine);
-            }
-            in.close();
-            return processingData.getLocalIDData(response.toString());
-
-        } else { 
-            return "ERROR"; 
-        } //TODO : access the database
-    }
-    public static Quote getQuoteRequest() throws IOException, JSONException {
+    public static Quote getQuoteRequest(QuoteRepository quoteR) throws IOException, JSONException {
         
         //Get the quote based on a category
-        URL url = new URL("http://quotes.rest/qod.json?category=management");
-        String readLine = null;
-        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-        connection.setRequestMethod("GET");
-        int responseCode = connection.getResponseCode();
+        int size = quoteR.size();
+        Random r = new Random();
+        int result = r.nextInt(size);
+        Quote q = quoteR.getQuote(result); //If was impossible get a new quote from REST API, their is a quote random from database
+        try {
+            URL url = new URL("http://quotes.rest/qod.json?category=management");
+            String readLine = null;
+            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+            connection.setRequestMethod("GET");
+            int responseCode = connection.getResponseCode();
 
-        if (responseCode == HttpURLConnection.HTTP_OK) {
-            BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream()));
-            StringBuffer response = new StringBuffer();
-            while((readLine = in.readLine()) != null) {
-                response.append(readLine);
-            }
-            in.close();
-            return processingData.getQuoteData(response.toString());
+            if (responseCode == HttpURLConnection.HTTP_OK) {
+                StringBuilder response;
+                try (BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream()))) {
+                    response = new StringBuilder();
+                    while((readLine = in.readLine()) != null) {
+                        response.append(readLine);
+                    }
+                }
+                q = processingData.getQuoteData(response.toString());
+            }            
+        }catch(IOException | JSONException e){
+            System.err.println(e);
         }
-        else {
-            return null;
-        }
+        return q;
     }
     public static String getTimeRequest() throws IOException, JSONException {
         URL url = new URL("http://worldclockapi.com/api/json/utc/now");
@@ -121,12 +100,13 @@ public class getData {
         int responseCode = connection.getResponseCode();
 
         if (responseCode == HttpURLConnection.HTTP_OK) {
-            BufferedReader in = new BufferedReader( new InputStreamReader(connection.getInputStream()) );
-            StringBuffer response = new StringBuffer();
-            while((readLine = in.readLine()) != null) {
-                response.append(readLine);
+            StringBuilder response;
+            try (BufferedReader in = new BufferedReader( new InputStreamReader(connection.getInputStream()) )) {
+                response = new StringBuilder();
+                while((readLine = in.readLine()) != null) {
+                    response.append(readLine);
+                }
             }
-            in.close();
             return processingData.getTimeData(response.toString());
         }
         else {
@@ -138,29 +118,31 @@ public class getData {
 ////////////////////////////////////////////////////// Funções auxiliares na classificação do Weather ////////////////////////////////
     
     /////////////// Lista de identificadores para as capitais distrito e ilhass //////////////
-    public static HashMap<Integer,String> getCitiesRequest() throws IOException, JSONException
+    public static ArrayList<City> getCitiesRequest() throws IOException, JSONException
     {
-        // GET all the cities
-        URL url = new URL("http://api.ipma.pt/open-data/distrits-islands.json");
-        String readLine = null;
-        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-        connection.setRequestMethod("GET");
+        ArrayList<City> cities = new ArrayList<>();
+        try{
+            URL url = new URL("http://api.ipma.pt/open-data/distrits-islands.json");
+            String readLine = null;
+            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+            connection.setRequestMethod("GET");
 
-        int responseCode = connection.getResponseCode();
+            int responseCode = connection.getResponseCode();
 
-        if (responseCode == HttpURLConnection.HTTP_OK) {
-            BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream()));
-            StringBuffer response = new StringBuffer();
-
-            while((readLine = in.readLine()) != null) {
-                response.append(readLine);
-            }
-            in.close();
-            return (HashMap<Integer, String>) processingData.getAllCities(response.toString());
+            if (responseCode == HttpURLConnection.HTTP_OK) {
+                StringBuilder response;
+                try (BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream()))) {
+                    response = new StringBuilder();
+                    while((readLine = in.readLine()) != null) {
+                        response.append(readLine);
+                    }
+                }
+                cities = processingData.getAllCities(response.toString());
+            }       
+        } catch(IOException | JSONException e){
+            System.err.println("Something has gone wrong in getting the cities. ERROR : "+e);
         }
-        else {
-            return new HashMap<Integer,String>();
-        }
+        return cities;
     }
     
     ///////////////////////// Lista de classes relativa à intensidade vento ////////////////////
