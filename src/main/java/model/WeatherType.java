@@ -8,6 +8,7 @@ package model;
 import java.io.Serializable;
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Size;
 
 /**
  *
@@ -16,19 +17,23 @@ import javax.validation.constraints.NotBlank;
  * descWeatherTypePT: Descrição em Português
  */
 @Entity
-@Table(name = "weatherType")
+@Table(name = "weather_type", schema="ES")
 public class WeatherType implements Serializable {
-   @Id
-   @Column(name = "type")
-   private String idWeatherType;
-   
-   @NotBlank
-   @Column(name = "description")
-   private String descWeatherType;
+    @Id
+    @Column(name = "weatherType")
+    @Size(min = 1, max = 100)    
+    private String idWeatherType;
 
+    @Column(name = "description")
+    private String descWeatherType;
+
+    
     public WeatherType(String idWeatherType, String descWeatherType) {
         this.idWeatherType = idWeatherType;
         this.descWeatherType = descWeatherType;
+    }
+
+    public WeatherType() {
     }
 
     public String getIdWeatherType() {

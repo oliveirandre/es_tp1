@@ -5,7 +5,7 @@
  */
 package repository;
 
-import model.WeatherType;
+import model.ClassWind;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -17,13 +17,12 @@ import org.springframework.stereotype.Repository;
  */
 
 @Repository
-public interface WeatherTypeRepository extends JpaRepository<WeatherType, Long> {
-
+public interface ClassWindRepository extends JpaRepository<ClassWind, Long> {
     /**
      *
      * @param weatherType
-     * @return description of the weather type
+     * @return description of the class wind
      */
-    @Query("SELECT wt.descWeatherType FROM WeatherType wt WHERE wt.idWeatherType=(:weatherType)")
-    String getDescription(@Param("weatherType") String weatherType);
+    @Query("SELECT cw.descClassWindSpeed FROM ClassWind cw WHERE cw.classWindSpeed=(:classWind)")
+    String getDescription(@Param("classWind") String classWind);    
 }

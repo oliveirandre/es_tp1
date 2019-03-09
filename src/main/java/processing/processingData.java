@@ -7,8 +7,10 @@ package processing;
 
 import java.io.IOException;
 import java.text.*;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -17,6 +19,10 @@ import model.Weather;
 import model.Quote;
 import model.WeatherType;
 import model.ClassWind;
+import org.springframework.stereotype.Component;
+import repository.ClassWindRepository;
+import repository.WeatherRepository;
+import repository.WeatherTypeRepository;
 
 
 /**
@@ -24,45 +30,64 @@ import model.ClassWind;
  * @author danielmartins
  * The class processingData is only for processing the information from the REST API
  */
+@Component
 public class processingData {
-    public static Weather[] getWeatherData(String response,String local) throws IOException, JSONException, ParseException{
+    
+    public static ArrayList<Weather> getWeatherData(String response,String local,WeatherRepository w, ClassWindRepository classWindRepository,WeatherTypeRepository weatherTypeRepository) throws IOException, JSONException, ParseException{
         JSONObject ipma = new JSONObject(response);
         
-        HashMap weatherType,classWind;
-        weatherType = getData.getWeatherTypeRequest();
-        classWind = getData.getClassWindRequest();
-        
-        String updateAt;
-        updateAt = ipma.getString("dataUpdate");
-        
+        String updateAt = "";
+        String forecastDate = "";
+        String idWeatherType = "";
+        String descType = "";
+        String tMin = "";
+        String tMax = "";
+        String classWindSpeed = "";
+        String descWind = "";
+        String predWindDir = "";
+        String precipitaProb = "";
+        String latitude = "";
+        String longitude = "";
         JSONArray d = new JSONArray(ipma.get("data").toString());
         String str = d.toString().substring(1, d.toString().length()-1);
 
-        Weather [] w = new Weather[5];
-        for (int i = 0; i < 5; i++) {
-            JSONObject ob = new JSONObject(d.getJSONObject(i).toString());
-            DateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss"); //2018-01-26T09:02:03
-            SimpleDateFormat sdfDate = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");//dd/MM/yyyy
-            
-            String forecastDate = ob.get("forecastDate").toString() instanceof String ? ob.get("forecastDate").toString() : ""; 
-            String idWeatherType = ob.get("idWeatherType").toString() instanceof String ? ob.get("idWeatherType").toString() : "";
-            String descType = weatherType.containsKey(Integer.parseInt(idWeatherType)) ? (String) weatherType.get(Integer.parseInt(idWeatherType)) : "";
-            String tMin = ob.get("tMin").toString() instanceof String ? ob.get("tMin").toString() : "";
-            String tMax = ob.get("tMax").toString() instanceof String ? ob.get("tMax").toString() : "";
-            String classWindSpeed = ob.get("classWindSpeed").toString() instanceof String ? ob.get("classWindSpeed").toString() : "";
-            String descWind = classWind.containsKey(classWindSpeed) ? (String) classWind.get(classWindSpeed) : "";
-            String predWindDir = ob.get("predWindDir").toString() instanceof String ? ob.get("predWindDir").toString() : "";
-            String precipitaProb = ob.get("precipitaProb").toString() instanceof String ? ob.get("precipitaProb").toString() : "";
-            String latitude = ob.get("latitude").toString() instanceof String ? ob.get("latitude").toString() : "";
-            String longitude = ob.get("longitude").toString() instanceof String ? ob.get("longitude").toString() : "";
-            
-            Date now = new Date();
-            String createAt = sdfDate.format(now);
-            
-            w[i] = new Weather(local,forecastDate,new WeatherType(idWeatherType,descType),tMin,tMax,new ClassWind(classWindSpeed,descWind),predWindDir,precipitaProb,latitude,longitude, sdfDate.parse(createAt), format.parse(updateAt));
+        List<String> checkLocal = w.checkLocal(local);
+        ArrayList<Weather> weather = new ArrayList<>();
+        DateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss"); //2018-01-26T09:02:03
+        SimpleDateFormat sdfDate = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss"); 
+        try{
+            Date createdAt;
+            if(checkLocal != null){ //Data to update the database
+                List<Date> l = w.createData(local);
+                createdAt = l.get(0);
+                w.deleteLocal(local);
+            }else { //Data to create a new information in database           
+                Date now = new Date();
+                String n = sdfDate.format(now);
+                createdAt = sdfDate.parse(n);                  
+            }
+            for (int i = 0; i < d.length(); i++ ) {
+                JSONObject ob = new JSONObject(d.getJSONObject(i).toString());
+                updateAt = ipma.getString("dataUpdate");
+                forecastDate = ob.get("forecastDate").toString() instanceof String ? ob.get("forecastDate").toString() : ""; 
+                idWeatherType = ob.get("idWeatherType").toString() instanceof String ? ob.get("idWeatherType").toString() : "";
+                descType = weatherTypeRepository.getDescription(idWeatherType);
+                tMin = ob.get("tMin").toString() instanceof String ? ob.get("tMin").toString() : "";
+                tMax = ob.get("tMax").toString() instanceof String ? ob.get("tMax").toString() : "";
+                classWindSpeed = ob.get("classWindSpeed").toString() instanceof String ? ob.get("classWindSpeed").toString() : "";
+                descWind = classWindRepository.getDescription(classWindSpeed);
+                predWindDir = ob.get("predWindDir").toString() instanceof String ? ob.get("predWindDir").toString() : "";
+                precipitaProb = ob.get("precipitaProb").toString() instanceof String ? ob.get("precipitaProb").toString() : "";
+                latitude = ob.get("latitude").toString() instanceof String ? ob.get("latitude").toString() : "";
+                longitude = ob.get("longitude").toString() instanceof String ? ob.get("longitude").toString() : "";
+                weather.add( new Weather(local,forecastDate,new WeatherType(idWeatherType,descType),tMin,tMax,new ClassWind(classWindSpeed,descWind),predWindDir,precipitaProb,latitude,longitude,createdAt, format.parse(updateAt)) );
+            }
+        }catch(Exception e){
+            System.err.println("Something's wrong processing the data. Error : "+e);
         }
-        
-        return w;
+
+        weather.forEach((we) -> {w.saveAndFlush(we);});
+        return weather;
     }
     public static String getLocalIDData(String response) throws JSONException {
         JSONObject json = new JSONObject(response);
@@ -108,27 +133,30 @@ public class processingData {
     }
     
     ///////////////////////// Classificação do vento ////////////////////////////////////////////
-    public static Map<String,String> getClassWind(String response) throws JSONException
+    public static ArrayList<ClassWind> getClassWind(String response) throws JSONException
     {
-        Map<String,String> wind = new HashMap();
+        ArrayList<ClassWind> wind = new ArrayList<>();
         JSONObject json = new JSONObject(response);
+        System.err.println("Json : "+json);
         JSONArray data = new JSONArray(json.get("data").toString());
         for (int i = 0; i < data.length(); i++) {
             JSONObject object = data.getJSONObject(i);
-            wind.put( (String) object.get("classWindSpeed"), (String) object.get("descClassWindSpeedDailyPT"));
+            System.out.println("Object Wind : "+object);
+            wind.add( new ClassWind( String.valueOf(object.get("classWindSpeed")), (String) object.get("descClassWindSpeedDailyPT")));
         }
         return wind; 
     }
     
     ///////////////////////// Lista de identificadores do tempo significativo ////////////////////
-    public static Map<Integer,String> getWeatherType(String response) throws JSONException
+    public static ArrayList<WeatherType> getWeatherType(String response) throws JSONException
     {
-        Map<Integer,String> type = new HashMap();
+        ArrayList<WeatherType> type = new ArrayList(); 
         JSONObject json = new JSONObject(response);
         JSONArray data = new JSONArray(json.get("data").toString());
         for (int i = 0; i < data.length(); i++) {
             JSONObject object = data.getJSONObject(i);
-            type.put( (int) object.get("idWeatherType"), (String) object.get("descIdWeatherTypePT"));
+            System.err.println("Object : "+object);
+            type.add( new WeatherType( String.valueOf(object.get("idWeatherType")), (String) object.get("descIdWeatherTypePT")));
         }
         return type; 
     }

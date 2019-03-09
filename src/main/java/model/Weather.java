@@ -29,7 +29,7 @@ import javax.validation.constraints.NotBlank;
  * longitude: longitude
 */
 @Entity
-@Table(name = "weather")
+@Table(name = "weather", schema="ES")
 @JsonIgnoreProperties(value = {"createdAt", "updatedAt"}, 
         allowGetters = true)
 public class Weather implements Serializable {
@@ -38,7 +38,7 @@ public class Weather implements Serializable {
     @GeneratedValue(strategy=GenerationType.AUTO)
     private Integer id;
     
-    
+    @NotBlank
     @Column(name = "local")
     private String globalIDLocal;
 
@@ -46,8 +46,6 @@ public class Weather implements Serializable {
     @Column(name = "forecastDate")
     private String forecastDate;
     
-    @NotBlank
-    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "weatherType", nullable = false)
     private WeatherType idWeatherType;
     
@@ -59,9 +57,7 @@ public class Weather implements Serializable {
     @Column(name = "max")
     private String tMax;
     
-    @NotBlank
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "windSpeed", nullable = false)
+    @JoinColumn(name = "wind_speed", nullable = false)
     private ClassWind classWindSpeed;
 
     @NotBlank
@@ -120,6 +116,9 @@ public class Weather implements Serializable {
         this.updatedAt = updatedAt;
     }
 
+    public Integer getId() {
+        return id;
+    }
     
     public String getGlobalIDLocal() {
         return globalIDLocal;
@@ -168,7 +167,7 @@ public class Weather implements Serializable {
     public Date getUpdatedAt() {
         return updatedAt;
     }
-
+    
     public void setGlobalIDLocal(String globalIDLocal) {
         this.globalIDLocal = globalIDLocal;
     }

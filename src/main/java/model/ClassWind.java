@@ -8,6 +8,7 @@ package model;
 import java.io.Serializable;
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Size;
 
 /**
  *
@@ -16,19 +17,22 @@ import javax.validation.constraints.NotBlank;
  * descClassWindSpeedPT: Descrição em Português
  */
 @Entity
-@Table(name = "classWind")
+@Table(name = "class_wind", schema="ES")
 public class ClassWind implements Serializable {
     @Id
-    @Column(name = "windSpeed")
+    @Column(name = "wind_speed")
+    @Size(min = 1, max = 100)
     private String classWindSpeed;
     
-    @NotBlank
     @Column(name = "description")
     private String descClassWindSpeed;
 
     public ClassWind(String classWindSpeed, String descClassWindSpeed) {
         this.classWindSpeed = classWindSpeed;
         this.descClassWindSpeed = descClassWindSpeed;
+    }
+
+    public ClassWind() {
     }
     
 
