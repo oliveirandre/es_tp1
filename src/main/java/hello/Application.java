@@ -3,6 +3,8 @@ package hello;
 import controller.IndexController;
 import controller.QuotesController;
 import controller.WeatherController;
+import service.Producer;
+import service.Consumer;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
@@ -15,6 +17,8 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 @ComponentScan(basePackageClasses = IndexController.class)
 @ComponentScan(basePackageClasses = WeatherController.class)
 @ComponentScan(basePackageClasses = QuotesController.class)
+@ComponentScan(basePackageClasses = Producer.class)
+@ComponentScan(basePackageClasses = Consumer.class)
 @ComponentScan("processing")
 @EnableJpaAuditing
 @EnableScheduling

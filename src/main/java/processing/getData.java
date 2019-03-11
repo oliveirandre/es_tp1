@@ -15,7 +15,6 @@ import java.util.ArrayList;
 import java.util.Random;
 import model.City;
 import model.ClassWind;
-import model.Image;
 import model.Quote;
 import org.json.JSONException;
 import model.Weather;
@@ -70,12 +69,14 @@ public class getData {
                     }
                 }
                 w = pd.getWeatherData(response.toString(),local);
+                w.forEach((we) -> {weatherRepository.saveAndFlush(we);}); //After get the information from REST API, update the database
             } else { // Get the data from database
                 w = (ArrayList<Weather>) weatherRepository.getWeatherFromALocal(local);
             }       
         }catch(JSONException | IOException | ParseException e){
             System.err.println(e);
         }
+        
         return w;
     }
     public static Quote getQuoteRequest(QuoteRepository quoteR) throws IOException, JSONException {
