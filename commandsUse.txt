@@ -28,10 +28,8 @@ Don't forget : "use SoftwareEnginnering;" in MySQL bash before any command
 
 5. CREATE DOCKER WITH SPOTIFY/KAFKA
 
-    -> docker run -d -p 2181:2181 -p 9092:9092 
-        --env ADVERTISED_HOST=kafka 
-        --env ADVERTISED_PORT=9092 
-        --name kafka spotify/kafka
+    -> docker run -d -p 2181:2181 -p 9092:9092 --env ADVERTISED_HOST=127.0.0.1 --env ADVERTISED_PORT=9092 --name kafka spotify/kafka
+
 
 
     ADVERTISTED_HOST was set to kafka, which will allow other containers to be able to run Producers and Consumers.

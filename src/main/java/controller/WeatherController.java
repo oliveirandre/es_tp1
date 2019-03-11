@@ -26,12 +26,12 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
 
 import repository.WeatherRepository;
 import repository.CityRepository;
 import repository.ClassWindRepository;
 import repository.WeatherTypeRepository;
+import service.Consumer;
 
 import service.Producer;
 
@@ -58,6 +58,9 @@ public class WeatherController {
     
     @Autowired
     private Producer producer;
+    
+    @Autowired 
+    private Consumer consumer;
 
     private static final String TOPIC = "Weather_Topic";
     
@@ -73,7 +76,7 @@ public class WeatherController {
     }
     
     @GetMapping(value = "/publish/{local}")
-    public void sendMessageToKafkaTopic(@PathVariable(value = "local") String Local) throws JSONException, IOException, ParseException {
+    public String sendMessageToKafkaTopic(@PathVariable(value = "local") String Local) throws JSONException, IOException, ParseException {
         
         getData g = new getData(weatherRepository,classWindRepository,weatherTypeRepository, cityRepository);
         
@@ -92,33 +95,9 @@ public class WeatherController {
           .put("content", new JSONObject().put("data", result)).toString();
         
         producer.sendMessage(resultToSend);
-    }
-        @GetMapping(value = "/{local}")
-    public String testLocal(@PathVariable(value = "local") String Local) throws JSONException, IOException, ParseException {
-        
-        getData g = new getData(weatherRepository,classWindRepository,weatherTypeRepository, cityRepository);
-        
-        LOCAL = Local;
-        LOCAL_ID = cityRepository.getId(LOCAL);
-        String result = "";
-        if(LOCAL_ID == null){
-            result = "No results about "+LOCAL;
-        }
-        ArrayList<Weather> weather = g.getWeatherRequest(LOCAL, LOCAL_ID);
-        result = weather.stream().map((s) -> s.toString()).reduce(result, String::concat);
-        
-        // The producer send this information to the consumers
-        String resultToSend = new JSONObject()
-          .put("title", "Daily Weather Forecast up to 5 days from "+LOCAL)
-          .put("content", new JSONObject().put("data", result)).toString();
-        
         return resultToSend;
-    }
-    
-    // Return all the cities that have information about the weather
-    @GetMapping("/cities")
-    public ArrayList<City> cities() throws IOException, JSONException {
-        return getData.getCitiesRequest();
+
+        
     }
     
     @Scheduled(cron="0 0/5 * * * ?") //Update the database every 5 minutes
@@ -129,6 +108,16 @@ public class WeatherController {
         System.out.println("\n Updated database : "+ dateFormat.format(new Date())+"\n");
         getData g = new getData(weatherRepository,classWindRepository,weatherTypeRepository, cityRepository);
         getData.getWeatherRequest(LOCAL,LOCAL_ID);
+        ArrayList<Weather> weather = g.getWeatherRequest(LOCAL, LOCAL_ID);
+        String result = "";
+        result = weather.stream().map((s) -> s.toString()).reduce(result, String::concat);
+        
+        // The producer send this information to the consumers
+        String resultToSend = new JSONObject()
+          .put("title", "Daily Weather Forecast up to 5 days from "+LOCAL)
+          .put("content", new JSONObject().put("data", result)).toString();
+        
+        producer.sendMessage(resultToSend);
     }
     
 }
