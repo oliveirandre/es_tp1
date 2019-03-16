@@ -22,6 +22,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -74,6 +75,7 @@ public class WeatherController {
         
     }
     
+    @CrossOrigin(origins = "http://localhost:3000")
     @GetMapping(value = "/publish/{local}")
     public String sendMessageToKafkaTopic(@PathVariable(value = "local") String Local) throws JSONException, IOException, ParseException {
         

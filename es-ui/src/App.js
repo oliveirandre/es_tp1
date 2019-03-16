@@ -11,7 +11,8 @@ class App extends Component {
   }
 
   componentDidMount() {
-    fetch('http://quotes.stormconsultancy.co.uk/random.json')
+    //fetch('http://quotes.stormconsultancy.co.uk/random.json')
+    fetch('http://localhost:8080/quotes/quotesAuthorTime')
       .then(res => res.json())
       .then(json => {
         this.setState({

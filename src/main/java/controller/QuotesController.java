@@ -9,7 +9,11 @@ import processing.getData;
 import java.io.IOException;
 import model.Quote;
 import org.json.JSONException;
+import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -33,12 +37,17 @@ public class QuotesController {
     public void getInformations() throws IOException, JSONException{
         quoteRepository.save(new Quote(QUOTE, AUTHOR));
     }    
+    
+    @CrossOrigin(origins = "http://localhost:9000")
     @RequestMapping("/quotesAuthorTime")
     public String quote() throws IOException, JSONException {
         getData g = new getData(quoteRepository);
         Quote quote = g.getQuoteRequest();
         String time = g.getTimeRequest();
         quoteRepository.save(new Quote(quote.getQuote(), quote.getAuthor()));
-        return quote.toString();
+        JSONObject json = new JSONObject();
+        json.put("quote", quote.getQuote());
+        json.put("author", quote.getAuthor());
+        return json.toString();
     }
 }
