@@ -10,6 +10,7 @@ import java.io.IOException;
 import model.Quote;
 import org.json.JSONException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import repository.QuoteRepository;
@@ -25,10 +26,18 @@ public class QuotesController {
     @Autowired
     QuoteRepository quoteRepository;
     
+    private String QUOTE = "Failures are only failures when we don’t learn from them, because when we learn from them they become lessons."; //Default
+    private String AUTHOR = "Jay Shetty"; //Default
+    
+    @ModelAttribute
+    public void getInformations() throws IOException, JSONException{
+        quoteRepository.save(new Quote(QUOTE, AUTHOR));
+    }    
     @RequestMapping("/quotesAuthorTime")
     public String quote() throws IOException, JSONException {
-        Quote quote = getData.getQuoteRequest(quoteRepository);
-        String time = getData.getTimeRequest();
+        getData g = new getData(quoteRepository);
+        Quote quote = g.getQuoteRequest();
+        String time = g.getTimeRequest();
         quoteRepository.save(new Quote(quote.getQuote(), quote.getAuthor()));
         return quote.toString();
     }

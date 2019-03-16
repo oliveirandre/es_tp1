@@ -37,6 +37,7 @@ public class getData {
     private static WeatherTypeRepository weatherTypeRepository;
     private static CityRepository cityRepository;
     private static ClassWindRepository classWindRepository;
+    private static QuoteRepository quoteRepository;
     
     public getData(WeatherRepository we, ClassWindRepository cw,WeatherTypeRepository wt,CityRepository ci) {
         this.weatherRepository = we;
@@ -44,7 +45,13 @@ public class getData {
         this.weatherTypeRepository = wt;
         this.cityRepository = ci;
     }
-    
+
+    public getData(QuoteRepository q) {
+        this.quoteRepository = q;
+    }
+
+    public getData() {
+    }
     
     public static ArrayList<Weather> getWeatherRequest(String local, String localId) throws IOException, JSONException, ParseException {
         
@@ -79,13 +86,15 @@ public class getData {
         
         return w;
     }
-    public static Quote getQuoteRequest(QuoteRepository quoteR) throws IOException, JSONException {
+    public static Quote getQuoteRequest() throws IOException, JSONException {
         
         //Get the quote based on a category
-        int size = quoteR.size();
+        int size = quoteRepository.size();
         Random r = new Random();
-        int result = r.nextInt(size);
-        Quote q = quoteR.getQuote(result); //If was impossible get a new quote from REST API, their is a quote random from database
+        int low = 0;
+        int high = size;
+        int result = r.nextInt(high-low) + low;
+        Quote q = quoteRepository.getQuote(result); //If was impossible get a new quote from REST API, their is a quote random from database
         try {
             URL url = new URL("http://quotes.rest/qod.json?category=management");
             String readLine = null;
