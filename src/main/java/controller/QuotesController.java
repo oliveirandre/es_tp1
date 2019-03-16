@@ -38,8 +38,8 @@ public class QuotesController {
         quoteRepository.save(new Quote(QUOTE, AUTHOR));
     }    
     
-    @CrossOrigin(origins = "http://localhost:9000")
-    @RequestMapping("/quotesAuthorTime")
+    @CrossOrigin(origins = "http://localhost:3000")
+    @GetMapping("/quotesAuthorTime")
     public String quote() throws IOException, JSONException {
         getData g = new getData(quoteRepository);
         Quote quote = g.getQuoteRequest();
