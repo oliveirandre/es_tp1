@@ -11,7 +11,7 @@ class App extends Component {
   }
 
   componentDidMount() {
-    fetch('https://jsonplaceholder.typicode.com/users')
+    fetch('http://quotes.stormconsultancy.co.uk/random.json')
       .then(res => res.json())
       .then(json => {
         this.setState({
@@ -29,13 +29,8 @@ class App extends Component {
     else {
       return (
         <div id="root" className="App">
-          <ul>
-            {items.map(item => (
-              <li key={item.id}>
-                Name: {item.name} | Email: {item.email}
-              </li>
-            ))}
-          </ul>
+          <h2>{ items.quote }</h2>
+          <p>By <span>{ items.author }</span> </p>
         </div>
       );
     }

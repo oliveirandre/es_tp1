@@ -30,6 +30,6 @@ public class QuotesController {
         Quote quote = getData.getQuoteRequest(quoteRepository);
         String time = getData.getTimeRequest();
         quoteRepository.save(new Quote(quote.getQuote(), quote.getAuthor()));
-        return quote +" "+time;
+        return quote.toString();
     }
 }

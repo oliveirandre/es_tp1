@@ -90,9 +90,13 @@ public class WeatherController {
         result = weather.stream().map((s) -> s.toString()).reduce(result, String::concat);
         
         // The producer send this information to the consumers
-        String resultToSend = new JSONObject()
+        /*String resultToSend = new JSONObject()
           .put("title", "Daily Weather Forecast up to 5 days from "+LOCAL)
-          .put("content", new JSONObject().put("data", result)).toString();
+          .put("content", new JSONObject().put("data", result)).toString();*/
+        
+        JSONObject res = new JSONObject();
+        res.put("data", "oi");
+        String resultToSend = res.toString();
         
         producer.sendMessage(resultToSend);
         return resultToSend;
