@@ -51,7 +51,7 @@ public class WeatherType implements Serializable {
 
     @Override
     public String toString() {
-        return "WeatherType{" + "idWeatherType=" + idWeatherType + ", descWeatherType=" + descWeatherType + '}';
+        return "{ \"idWeatherType\" : \"" + idWeatherType + "\" , \"descWeatherType\" : \"" + descWeatherType + "\" }";
     }
    
    

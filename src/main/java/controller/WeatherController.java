@@ -89,15 +89,11 @@ public class WeatherController {
         }
         ArrayList<Weather> weather = g.getWeatherRequest(LOCAL, LOCAL_ID);
         result = weather.stream().map((s) -> s.toString()).reduce(result, String::concat);
-        
+        System.out.println(result);
         // The producer send this information to the consumers
-        /*String resultToSend = new JSONObject()
+        String resultToSend = new JSONObject()
           .put("title", "Daily Weather Forecast up to 5 days from "+LOCAL)
-          .put("content", new JSONObject().put("data", result)).toString();*/
-        
-        JSONObject res = new JSONObject();
-        res.put("data", "oi");
-        String resultToSend = res.toString();
+          .put("content", new JSONObject(result)).toString();
         
         producer.sendMessage(resultToSend);
         return resultToSend;

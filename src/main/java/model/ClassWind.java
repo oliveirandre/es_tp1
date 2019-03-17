@@ -51,7 +51,7 @@ public class ClassWind implements Serializable {
 
     @Override
     public String toString() {
-        return "ClassWind{" + "classWindSpeed=" + classWindSpeed + ", descClassWindSpeed=" + descClassWindSpeed + '}';
+        return "{ \"classWindSpeed\" : \"" + classWindSpeed + "\" , \"descClassWindSpeed\" : \"" + descClassWindSpeed + "\" }";
     }
     
     

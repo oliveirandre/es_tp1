@@ -52,7 +52,7 @@ public class City implements Serializable {
 
     @Override
     public String toString() {
-        return "City{" + "id = " + id_city + ", City = " + City + '}';
+        return "{ \"id\" : \"" + id_city + "\" , \"City\" : \"" + City + "\" }";
     }
     
 }

@@ -31,7 +31,7 @@ import javax.validation.constraints.Size;
  * longitude: longitude
 */
 @Entity
-@Table(name = "weather", schema="ES")
+@Table(name  = "weather", schema="ES")
 @JsonIgnoreProperties(value = {"createdAt", "updatedAt"}, 
         allowGetters = true)
 public class Weather implements Serializable {
@@ -226,7 +226,7 @@ public class Weather implements Serializable {
 
     @Override
     public String toString() {
-        return "Weather{" + "globalIDLocal=" + globalIDLocal.toString() + ", forecastDate=" + forecastDate + ", idWeatherType=" + idWeatherType.toString() + ", tMin=" + tMin + ", tMax=" + tMax + ", classWindSpeed=" + classWindSpeed.toString() + ", classWindDir=" + classWindDir + ", probPrecipita=" + probPrecipita + ", latitude=" + latitude + ", longitude=" + longitude + ", createdAt=" + createdAt + ", updatedAt=" + updatedAt + '}';
+        return "{ \"globalIDLocal\" : " +globalIDLocal.toString() + ", \"forecastDate\" : \"" + forecastDate + "\" , \"idWeatherType\" : " + idWeatherType.toString() + " , \"tMin\" : \"" + tMin + "\" , \"tMax\" : \"" + tMax + "\" , \"classWindSpeed\" : " + classWindSpeed.toString() + " , \"classWindDir\" : \"" + classWindDir + "\" , \"probPrecipita\" : \"" + probPrecipita + "\" , \"latitude\" : \"" + latitude + "\" , \"longitude\" : \"" + longitude + "\" , \"createdAt\" : \" " + createdAt + "\" , \"updatedAt\" : \"" + updatedAt + "\"}";
     }
     
     
