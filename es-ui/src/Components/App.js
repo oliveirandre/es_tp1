@@ -2,19 +2,19 @@ import React, { Component } from 'react';
 
 import Weather from "./Weather";
 
-class App extends Component {
-
-  constructor(props) {
-    super(props);
-    this.state = {
-      items: [],
-      isLoaded: false,
+export default class App extends Component {
+    
+    constructor(props) {
+      super(props);
+      this.state = {
+        items: [],
+        isLoaded: false,
+      }
     }
-  }
 
   componentDidMount() {
-    //fetch('http://quotes.stormconsultancy.co.uk/random.json')
-    fetch('http://localhost:8080/weather/publish/Aveiro')
+    const { params } = this.props.match  
+    fetch('http://localhost:8080/weather/publish/'+params.local)
       .then(res => res.json())
       .then(json => {
         this.setState({
@@ -30,67 +30,56 @@ class App extends Component {
       return <div>Loading...</div>
     }
     else {
-      return (
-        <div id="root" className="App">
-          <h2>{ items.content.globalIDLocal.City }</h2>
-          <p>By <span>{ items.author }</span> </p>
-          <div class="container text-center vcenter">
-                    <h1> Local Weather</h1>
-                    <div class="panel panel-default">
-                        <div class="panel-body">
-                            <div class="row">
-                                <div class="col-md-6 text-left">
-                                    <h3 id="city"><i class="fa fa-map-marker"></i>&nbsp;&nbsp;<span>{items.content.globalIDLocal.City }</span></h3>
+        return (
+            <div id="root" className="App">
+                <h2 style={{'font-size': '60px'}}> Metereologia</h2>
+                    <div class = "panel panel-default" style={{'height': '60%','weight': '60%' }}>
+                        <div class = "panel-body">
+                            <div class = "col-md-6 text-left" >
+                                <h3 id = "city" style={{'color' : '#333' }} ><i class="fa fa-map-marker"/>&nbsp;&nbsp;<span>{ items.content.globalIDLocal.City}</span></h3>
+                            </div>        
+                        </div>
+                        <hr/>
+                        <div id = "display">
+                            <div class = "row">
+                                <div class = "col-md-6" id = "weather-icon-display">
+                                    <div id = "weather-icon"><i class = "wi wi-sleet"></i></div>
                                 </div>
-                                <div class="col-md-6 text-right temp-switch">
-                                    <h3><input id="switch-temp" type="checkbox" data-off-color="info"  data-on-color="default" data-label-text="<i class='wi wi-thermometer'></i>" data-label-icon="<i class='wi wi-celsius'></i>" data-on-text="<i class='wi wi-fahrenheit'></i>" data-off-text="<i class='wi wi-celsius'></i>" /></h3>
-                                </div>          
-                            </div>
-                            <hr/>
-                            <div id="display">
-                                <div class="row">
-                                    <div class="col-md-6" id="weather-icon-display">
-                                        <div id="weather-icon"><i class="wi wi-sleet"></i></div>
-                                    </div>
-                                    <div class="col-md-6" id="temperature">
-                                        <h4>Today</h4>
-
-                                        <p><span id="temp">73</span><sup>&deg;<span id="metric">F</span></sup></p>                 
-                                        <h5>High: <span id="temp-max">{items.content.tMax}</span> / Low: <span id="temp-min">{ items.content.tMin }</span></h5>
-                                    </div>
+                                <div class = "col-md-6" id = "temperature">
+                                    <h4> Today </h4>
+                                    <p> <span id = "temp" style={{'color' : '#333', 'font-size' : '200px' }}> { items.content.tMax} </span><sup style={{'color' : '#333' }}>&deg;<span id="metric" style={{'color' : '#333' }}>C</span></sup></p>
+                                    <h5> High: <span id = "temp-max"> { items.content.tMax} </span> / Low: <span id = "temp-min"> { items.content.tMin} </span></h5>
                                 </div>
                             </div>
-                            <hr id="hr-bottom" />
-                            <div class="row" id="weather-condition">
-                                <div class="col-md-2 col-md-offset-1">
-                                    <h6><i class="wi wi-cloud"></i></h6>
-                                    <p id="condition">{ items.content.idWeatherType.descWeatherType } </p>
-                                </div>
-                                <div class="col-md-2">
-                                    <h6><i class="wi wi-humidity"></i></h6>
-                                    <p id="humidity">10%</p>
-                                </div>
-                                <div class="col-md-2">
-                                    <h6><i class="wi wi-strong-wind"></i></h6>
-                                    <p id="wind">windy 20 NE</p>
-                                </div>
-                                <div class="col-md-2">
-                                    <h6><i class="wi wi-barometer"></i></h6>
-                                    <p id="hpa">10 psi</p>
-                                </div>
-                                <div class="col-md-2">
-                                    <h6><i class="wi wi-showers"></i></h6>
-                                    <p id="prec">10%</p>
-                                </div>          
-                            </div>
-                            <hr/>
+                        </div>
+                        <hr id = "hr-bottom"/>
+                        <div class = "row" id = "weather-condition" >
+                            <div class = "col-md-2 col-md-offset-1">
+                            <h6><i class = "wi wi-cloud"> </i></h6 >
+                            <p id = "condition" style={{'color' : '#333' }}> { items.content.idWeatherType.descWeatherType}</p>
+                        </div>
+                        <div class = "col-md-2" >
+                            <h6><i class = "wi wi-time-4"></i></h6 >
+                            <p id = "humidity" style={{'color' : '#333' }}> { items.content.forecastDate} </p>
+                        </div>
+                        <div class = "col-md-2" >
+                            <h6> <i class = "wi wi-strong-wind"></i></h6 >
+                            <p id = "wind" style={{'color' : '#333' }}> { items.content.classWindSpeed.descClassWindSpeed} , { items.content.classWindDir}</p>
+                        </div>
+                        <div class = "col-md-2" >
+                            <p id = "hpa" style={{'color' : '#333' }}> Latitude : {items.content.latitude}</p>
+                            <p id = "hpa" style={{'color' : '#333' }}> Longitude : {items.content.longitude}</p>
+                        </div>
+                        <div class = "col-md-2" >
+                            <h6><i class = "wi wi-showers"> </i></h6>
+                            <p id = "prec" style={{'color' : '#333' }}> {items.content.probPrecipita} % </p>
                         </div>
                     </div>
-               </div>
-        </div>
-      );
+                </div>
+                <h2 style={{'font-size': '30px'}} >Failures are only failures when we don’t learn from them, because when we learn from them they become lessons.</h2>
+                <p style={{'font-size': '30px'}} >By <span>Jay Shetty</span> </p>
+            </div>
+        );
     }
   }
 }
-
-export default App;

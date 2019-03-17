@@ -64,7 +64,7 @@ public class Quote {
     
     @Override
     public String toString() {
-        return String.format("Quote{id=%d, quote=%s, author=%s}", quote_id, quote, author);
+        return String.format("{ \"id\" : \"%d\", \"quote\" : \"%s\", \"author\" : \"%s\" }", quote_id, quote, author);
     }
 
     

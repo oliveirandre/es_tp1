@@ -12,6 +12,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import model.Quote;
 
 import model.Weather;
 
@@ -30,6 +31,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import repository.WeatherRepository;
 import repository.CityRepository;
 import repository.ClassWindRepository;
+import repository.QuoteRepository;
 import repository.WeatherTypeRepository;
 import service.Consumer;
 
@@ -52,6 +54,9 @@ public class WeatherController {
 
     @Autowired
     ClassWindRepository classWindRepository;
+    
+    @Autowired
+    QuoteRepository quoteRepository;
     
     @Autowired
     CityRepository cityRepository;
@@ -85,18 +90,28 @@ public class WeatherController {
         LOCAL_ID = cityRepository.getId(LOCAL);
         String result = "";
         if(LOCAL_ID == null){
-            result = "No results about "+LOCAL;
+            result = "{\"data\":\"No results about "+LOCAL+"\"}";
         }
         ArrayList<Weather> weather = g.getWeatherRequest(LOCAL, LOCAL_ID);
         result = weather.stream().map((s) -> s.toString()).reduce(result, String::concat);
-        System.out.println(result);
-        // The producer send this information to the consumers
-        String resultToSend = new JSONObject()
-          .put("title", "Daily Weather Forecast up to 5 days from "+LOCAL)
-          .put("content", new JSONObject(result)).toString();
+
+        //getData gq = new getData(quoteRepository);
+        //Quote quote = gq.getQuoteRequest();
+        //quoteRepository.save(new Quote(quote.getQuote(), quote.getAuthor()));
+        //json.put("quote", quote.getQuote());
+        //json.put("author", quote.getAuthor());
+        Quote q = new Quote("Failures are only failures when we don’t learn from them, because when we learn from them they become lessons.","Jay Shetty");
+
+        JSONObject resultToSend = new JSONObject();
+        resultToSend.put("title", "Daily Weather Forecast up to 5 days from "+LOCAL);
+        resultToSend.put("content", new JSONObject(result));
+        resultToSend.put("quote", q.toString());
+        System.out.println(resultToSend);
+        String f = resultToSend.toString();
         
-        producer.sendMessage(resultToSend);
-        return resultToSend;
+        // The producer send this information to the consumers
+        producer.sendMessage(f);
+        return f;
 
         
     }
