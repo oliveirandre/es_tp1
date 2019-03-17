@@ -80,6 +80,6 @@ export default class App extends Component {
                 <p style={{'font-size': '30px'}} >By <span>Jay Shetty</span> </p>
             </div>
         );
-    }
+    }   
   }
 }
